@@ -2,7 +2,7 @@
 
 Checking the bundle sizes with source map explorer.
 
-The project uses Angular 13.1
+The project uses Angular 13.1 (based on https://github.com/DeborahK/Angular-NgRx-GettingStarted)
 
 See the branches for the different setups.
 
