@@ -10,8 +10,8 @@ Run `npm run build:stats` to let source-map-explorer calculate the bundle sizes.
 
 ## Results:
 
-### MiniRx Store (3.0.1)
+### [MiniRx Store](https://mini-rx.io/) (3.0.1)
 [combined] (381.49 KB)
 
-### NgRx Store, Effects (13.0.2)
+### [NgRx Store, Effects](https://ngrx.io/) (13.0.2)
 [combined] (393.41 KB)
