@@ -2,7 +2,7 @@
 import { User } from '../user';
 
 import { createFeatureSelector, createSelector } from 'mini-rx-store';
-import { reducer as createReducer, on} from 'ts-action';
+import { reducer as createReducer, on } from 'ts-action';
 import { UserPageActions } from './actions';
 
 // State for this feature (User)
