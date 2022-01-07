@@ -1,4 +1,4 @@
-### State Management Comparison Angular
+## State Management Comparison Angular
 
 Checking the bundle sizes with source map explorer.
 
