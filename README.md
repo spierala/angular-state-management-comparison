@@ -1,8 +1,8 @@
 ## State Management Comparison Angular
 
-Checking the bundle sizes with source map explorer.
+Checking the bundle sizes of different state management solutions with source-map-explorer.
 
-The project uses Angular 13.1
+The project is based on https://github.com/DeborahK/Angular-NgRx-GettingStarted and uses Angular 13.1
 
 See the branches for the different setups.
 
