@@ -6,7 +6,7 @@ The project is based on https://github.com/DeborahK/Angular-NgRx-GettingStarted 
 
 See the branches for the different setups.
 
-Run `npm run build:stats` to let source-map-explorer calculate the bundle sizes.
+Run `npm run build:stats` to let source-map-explorer calculate the bundle size.
 
 ## Results:
 
