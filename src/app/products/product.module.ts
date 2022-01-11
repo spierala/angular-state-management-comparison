@@ -6,11 +6,8 @@ import { SharedModule } from '../shared/shared.module';
 import { ProductShellComponent } from './product-shell/product-shell.component';
 import { ProductListComponent } from './product-list/product-list.component';
 import { ProductEditComponent } from './product-edit/product-edit.component';
-
-import { StoreModule } from '@ngrx/store';
-import { productReducer } from './state/product.reducer';
-import { EffectsModule } from '@ngrx/effects';
-import { ProductEffects } from './state/product.effects';
+import { NgxsModule } from '@ngxs/store';
+import { ProductStateFacadeService } from './state/product-state-facade.service';
 
 const productRoutes: Routes = [{ path: '', component: ProductShellComponent }];
 
@@ -18,8 +15,7 @@ const productRoutes: Routes = [{ path: '', component: ProductShellComponent }];
     imports: [
         SharedModule,
         RouterModule.forChild(productRoutes),
-        StoreModule.forFeature('products', productReducer),
-        EffectsModule.forFeature([ProductEffects]),
+        NgxsModule.forFeature([ProductStateFacadeService]),
     ],
     declarations: [ProductShellComponent, ProductListComponent, ProductEditComponent],
 })

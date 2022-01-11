@@ -1,31 +1,37 @@
 import { Product } from '../../product';
 
-import { createAction, props } from '@ngrx/store';
+export class ToggleProductCode {
+    static readonly type = '[Product Page] Toggle Product Code';
+}
 
-export const toggleProductCode = createAction('[Product Page] Toggle Product Code');
+export class SetCurrentProduct {
+    static readonly type = '[Product Page] Set Current Product';
+    constructor(public currentProductId: number) {}
+}
 
-export const setCurrentProduct = createAction(
-    '[Product Page] Set Current Product',
-    props<{ currentProductId: number }>()
-);
+export class ClearCurrentProduct {
+    static readonly type = '[Product Page] Clear Current Product';
+}
 
-export const clearCurrentProduct = createAction('[Product Page] Clear Current Product');
+export class InitializeCurrentProduct {
+    static readonly type = '[Product Page] Initialize Current Product';
+}
 
-export const initializeCurrentProduct = createAction('[Product Page] Initialize Current Product');
+export class LoadProducts {
+    static readonly type = '[Product Page] Load';
+}
 
-export const loadProducts = createAction('[Product Page] Load');
+export class UpdateProduct {
+    static readonly type = '[Product Page] Update Product';
+    constructor(public product: Product) {}
+}
 
-export const updateProduct = createAction(
-    '[Product Page] Update Product',
-    props<{ product: Product }>()
-);
+export class CreateProduct {
+    static readonly type = '[Product Page] Create Product';
+    constructor(public product: Product) {}
+}
 
-export const createProduct = createAction(
-    '[Product Page] Create Product',
-    props<{ product: Product }>()
-);
-
-export const deleteProduct = createAction(
-    '[Product Page] Delete Product',
-    props<{ productId: number }>()
-);
+export class DeleteProduct {
+    static readonly type = '[Product Page] Delete Product';
+    constructor(public productId: number) {}
+}

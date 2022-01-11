@@ -17,9 +17,9 @@ import { PageNotFoundComponent } from './home/page-not-found.component';
 /* Feature Modules */
 import { UserModule } from './user/user.module';
 
-import { StoreModule } from '@ngrx/store';
-import { EffectsModule } from '@ngrx/effects';
 import { extModules } from './build-specifics';
+import { NgxsModule } from '@ngxs/store';
+import { environment } from 'src/environments/environment';
 
 @NgModule({
     imports: [
@@ -28,8 +28,7 @@ import { extModules } from './build-specifics';
         HttpClientInMemoryWebApiModule.forRoot(ProductData),
         UserModule,
         AppRoutingModule,
-        StoreModule.forRoot({}),
-        EffectsModule.forRoot([]),
+        NgxsModule.forRoot([], { developmentMode: !environment.production }),
         extModules,
     ],
     declarations: [

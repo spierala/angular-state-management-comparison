@@ -1,7 +1,7 @@
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 
 export const extModules = [
-    StoreDevtoolsModule.instrument({
+    NgxsReduxDevtoolsPluginModule.forRoot({
         maxAge: 25,
     }),
 ];

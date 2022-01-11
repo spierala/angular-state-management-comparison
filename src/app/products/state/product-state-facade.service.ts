@@ -1,52 +1,176 @@
 import { Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { catchError, EMPTY, Observable, tap } from 'rxjs';
 import { Product } from '../product';
-import { getCurrentProduct, getError, getProducts, getShowProductCode } from './index';
 import { ProductPageActions } from './actions';
+import { Action, Select, Selector, State, StateContext, Store } from '@ngxs/store';
+import { ProductService } from '../product.service';
 
+export interface ProductState {
+    showProductCode: boolean;
+    currentProductId: number | null;
+    products: Product[];
+    error: string;
+}
+
+const initialState: ProductState = {
+    showProductCode: true,
+    currentProductId: null,
+    products: [],
+    error: '',
+};
+
+@State<ProductState>({
+    name: 'products',
+    defaults: initialState,
+})
 @Injectable({
     providedIn: 'root',
 })
 export class ProductStateFacadeService {
-    displayCode$: Observable<boolean> = this.store.select(getShowProductCode);
-    selectedProduct$: Observable<Product | undefined | null> = this.store.select(getCurrentProduct);
-    products$: Observable<Product[]> = this.store.select(getProducts);
-    errorMessage$: Observable<string> = this.store.select(getError);
+    @Select(ProductStateFacadeService.getShowProductCode) displayCode$: Observable<boolean>;
+    @Select(ProductStateFacadeService.getCurrentProduct) selectedProduct$: Observable<
+        Product | undefined | null
+    >;
+    @Select(ProductStateFacadeService.getProducts) products$: Observable<Product[]>;
+    @Select(ProductStateFacadeService.getError) errorMessage$: Observable<string>;
 
-    constructor(private store: Store) {}
-
-    loadProducts(): void {
-        this.store.dispatch(ProductPageActions.loadProducts());
+    @Selector()
+    static getProductFeatureState(state: ProductState) {
+        return state;
     }
 
-    toggleProductCode(): void {
-        this.store.dispatch(ProductPageActions.toggleProductCode());
+    @Selector([ProductStateFacadeService.getProductFeatureState])
+    static getShowProductCode(state: ProductState) {
+        return state.showProductCode;
     }
 
-    initializeCurrentProduct(): void {
-        this.store.dispatch(ProductPageActions.initializeCurrentProduct());
+    @Selector([ProductStateFacadeService.getProductFeatureState])
+    static getCurrentProductId(state: ProductState) {
+        return state.currentProductId;
     }
 
-    setCurrentProduct(product: Product): void {
-        this.store.dispatch(
-            ProductPageActions.setCurrentProduct({ currentProductId: product.id! })
+    @Selector([
+        ProductStateFacadeService.getProductFeatureState,
+        ProductStateFacadeService.getCurrentProductId,
+    ])
+    static getCurrentProduct(state: ProductState, currentProductId: number) {
+        if (currentProductId === 0) {
+            return {
+                id: 0,
+                productName: '',
+                productCode: 'New',
+                description: '',
+                starRating: 0,
+            };
+        } else {
+            return currentProductId ? state.products.find((p) => p.id === currentProductId) : null;
+        }
+    }
+
+    @Selector([ProductStateFacadeService.getProductFeatureState])
+    static getProducts(state: ProductState) {
+        return state.products;
+    }
+
+    @Selector([ProductStateFacadeService.getProductFeatureState])
+    static getError(state: ProductState) {
+        return state.error;
+    }
+
+    constructor(private productService: ProductService, private store: Store) {}
+
+    @Action(ProductPageActions.ToggleProductCode)
+    private _toggleProductCode(ctx: StateContext<ProductState>) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            showProductCode: !state.showProductCode,
+        });
+    }
+
+    @Action(ProductPageActions.SetCurrentProduct)
+    private _setCurrentProduct(
+        ctx: StateContext<ProductState>,
+        action: ProductPageActions.SetCurrentProduct
+    ) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            currentProductId: action.currentProductId,
+        });
+    }
+
+    @Action(ProductPageActions.ClearCurrentProduct)
+    private _clearCurrentProduct(ctx: StateContext<ProductState>) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            currentProductId: null,
+        });
+    }
+
+    @Action(ProductPageActions.InitializeCurrentProduct)
+    private _initializeCurrentProduct(ctx: StateContext<ProductState>) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            currentProductId: 0,
+        });
+    }
+
+    @Action(ProductPageActions.LoadProducts)
+    private _loadProducts(ctx: StateContext<ProductState>) {
+        return this.productService.getProducts().pipe(
+            tap((products) => {
+                const state = ctx.getState();
+                ctx.setState({
+                    ...state,
+                    products,
+                    error: '',
+                });
+            }),
+            catchError((error) => {
+                debugger;
+                const state = ctx.getState();
+                ctx.setState({
+                    ...state,
+                    products: [],
+                    error,
+                });
+                return EMPTY;
+            })
         );
     }
 
+    loadProducts(): void {
+        this.store.dispatch(new ProductPageActions.LoadProducts());
+    }
+
+    toggleProductCode(): void {
+        this.store.dispatch(new ProductPageActions.ToggleProductCode());
+    }
+
+    initializeCurrentProduct(): void {
+        this.store.dispatch(new ProductPageActions.InitializeCurrentProduct());
+    }
+
+    setCurrentProduct(product: Product): void {
+        this.store.dispatch(new ProductPageActions.SetCurrentProduct(product.id!));
+    }
+
     deleteProduct(product: Product): void {
-        this.store.dispatch(ProductPageActions.deleteProduct({ productId: product.id! }));
+        this.store.dispatch(new ProductPageActions.DeleteProduct(product.id!));
     }
 
     clearCurrentProduct(): void {
-        this.store.dispatch(ProductPageActions.clearCurrentProduct());
+        this.store.dispatch(new ProductPageActions.ClearCurrentProduct());
     }
 
     createProduct(product: Product): void {
-        this.store.dispatch(ProductPageActions.createProduct({ product }));
+        this.store.dispatch(new ProductPageActions.CreateProduct(product));
     }
 
     updateProduct(product: Product): void {
-        this.store.dispatch(ProductPageActions.updateProduct({ product }));
+        this.store.dispatch(new ProductPageActions.UpdateProduct(product));
     }
 }
