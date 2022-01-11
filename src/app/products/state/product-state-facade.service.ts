@@ -39,20 +39,17 @@ export class ProductStateFacadeService {
         return state;
     }
 
-    @Selector([ProductStateFacadeService.getProductFeatureState])
+    @Selector()
     static getShowProductCode(state: ProductState) {
         return state.showProductCode;
     }
 
-    @Selector([ProductStateFacadeService.getProductFeatureState])
+    @Selector()
     static getCurrentProductId(state: ProductState) {
         return state.currentProductId;
     }
 
-    @Selector([
-        ProductStateFacadeService.getProductFeatureState,
-        ProductStateFacadeService.getCurrentProductId,
-    ])
+    @Selector([ProductStateFacadeService.getCurrentProductId])
     static getCurrentProduct(state: ProductState, currentProductId: number) {
         if (currentProductId === 0) {
             return {
@@ -67,12 +64,12 @@ export class ProductStateFacadeService {
         }
     }
 
-    @Selector([ProductStateFacadeService.getProductFeatureState])
+    @Selector()
     static getProducts(state: ProductState) {
         return state.products;
     }
 
-    @Selector([ProductStateFacadeService.getProductFeatureState])
+    @Selector()
     static getError(state: ProductState) {
         return state.error;
     }
@@ -130,11 +127,93 @@ export class ProductStateFacadeService {
                 });
             }),
             catchError((error) => {
-                debugger;
                 const state = ctx.getState();
                 ctx.setState({
                     ...state,
                     products: [],
+                    error,
+                });
+                return EMPTY;
+            })
+        );
+    }
+
+    @Action(ProductPageActions.CreateProduct)
+    private _createProduct(
+        ctx: StateContext<ProductState>,
+        action: ProductPageActions.CreateProduct
+    ) {
+        return this.productService.createProduct(action.product).pipe(
+            tap((products) => {
+                const state = ctx.getState();
+
+                ctx.setState({
+                    ...state,
+                    products: [...state.products, action.product],
+                    currentProductId: action.product.id,
+                    error: '',
+                });
+            }),
+            catchError((error) => {
+                const state = ctx.getState();
+                ctx.setState({
+                    ...state,
+                    error,
+                });
+                return EMPTY;
+            })
+        );
+    }
+
+    @Action(ProductPageActions.UpdateProduct)
+    private _updateProduct(
+        ctx: StateContext<ProductState>,
+        action: ProductPageActions.UpdateProduct
+    ) {
+        return this.productService.updateProduct(action.product).pipe(
+            tap((products) => {
+                const state = ctx.getState();
+                const updatedProducts = state.products.map((item) =>
+                    action.product.id === item.id ? action.product : item
+                );
+
+                ctx.setState({
+                    ...state,
+                    products: updatedProducts,
+                    currentProductId: action.product.id,
+                    error: '',
+                });
+            }),
+            catchError((error) => {
+                const state = ctx.getState();
+                ctx.setState({
+                    ...state,
+                    error,
+                });
+                return EMPTY;
+            })
+        );
+    }
+
+    @Action(ProductPageActions.DeleteProduct)
+    private _deleteProduct(
+        ctx: StateContext<ProductState>,
+        action: ProductPageActions.DeleteProduct
+    ) {
+        return this.productService.deleteProduct(action.productId).pipe(
+            tap((products) => {
+                const state = ctx.getState();
+                ctx.setState({
+                    ...state,
+                    products: state.products.filter((product) => product.id !== action.productId),
+                    currentProductId: null,
+                    error: '',
+                });
+            }),
+            catchError((error) => {
+                const state = ctx.getState();
+                ctx.setState({
+                    ...state,
                     error,
                 });
                 return EMPTY;
