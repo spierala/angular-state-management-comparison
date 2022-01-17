@@ -18,6 +18,8 @@ Run `npm run build:stats` to let source-map-explorer calculate the bundle size.
 
 [combined] (393.41 KB)
 
+Uses [@ngrx/effects](https://ngrx.io/guide/effects) for effects
+
 ### [NGXS](https://www.ngxs.io/) (3.7.3)
 
 [combined] (395.64 KB)
@@ -26,6 +28,6 @@ FYI: currently no effects with RxJS flattening operators implemented.
 
 ### [Akita](https://datorama.github.io/akita/) (7.1.1)
 
-Uses [ngneat/effects](https://github.com/ngneat/effects) for effects
-
 [combined] (402.6 KB)
+
+Uses [ngneat/effects](https://github.com/ngneat/effects) for effects
