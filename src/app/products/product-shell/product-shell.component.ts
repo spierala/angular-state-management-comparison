@@ -1,12 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Product } from '../product';
-import { ProductStateFacadeService } from '../state/product-state-facade.service';
+import { ProductsQuery, ProductStateFacadeService } from '../state/product-state-facade.service';
 
 @Component({
     templateUrl: './product-shell.component.html',
 })
 export class ProductShellComponent implements OnInit {
-    constructor(public productState: ProductStateFacadeService) {}
+    constructor(
+        public productState: ProductStateFacadeService,
+        public productsQuery: ProductsQuery
+    ) {}
 
     ngOnInit(): void {
         this.productState.loadProducts();
