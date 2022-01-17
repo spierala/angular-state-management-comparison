@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Product } from '../product';
-import { ProductsQuery, ProductStateFacadeService } from '../state/product-state-facade.service';
+import {
+    ProductEffects,
+    ProductsQuery,
+    ProductStateFacadeService,
+} from '../state/product-state-facade.service';
 
 @Component({
     templateUrl: './product-shell.component.html',
@@ -8,11 +12,12 @@ import { ProductsQuery, ProductStateFacadeService } from '../state/product-state
 export class ProductShellComponent implements OnInit {
     constructor(
         public productState: ProductStateFacadeService,
-        public productsQuery: ProductsQuery
+        public productsQuery: ProductsQuery,
+        public productEffects: ProductEffects
     ) {}
 
     ngOnInit(): void {
-        this.productState.loadProducts();
+        this.productEffects.loadProducts();
     }
 
     checkChanged(): void {
@@ -28,7 +33,7 @@ export class ProductShellComponent implements OnInit {
     }
 
     deleteProduct(product: Product): void {
-        this.productState.deleteProduct(product);
+        this.productEffects.deleteProduct(product);
     }
 
     clearProduct(): void {
@@ -36,10 +41,10 @@ export class ProductShellComponent implements OnInit {
     }
 
     saveProduct(product: Product): void {
-        this.productState.createProduct(product);
+        this.productEffects.createProduct(product);
     }
 
     updateProduct(product: Product): void {
-        this.productState.updateProduct(product);
+        this.productEffects.updateProduct(product);
     }
 }

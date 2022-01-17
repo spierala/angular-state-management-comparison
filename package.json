@@ -23,6 +23,7 @@
         "@angular/router": "~13.1.0",
         "@datorama/akita": "^7.1.1",
         "@datorama/akita-ngdevtools": "^7.0.0",
+        "@ngneat/effects-ng": "^1.0.0",
         "bootstrap": "^4.4.1",
         "rxjs": "~7.4.0",
         "tslib": "^2.3.0",
