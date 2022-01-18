@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../user';
-import { Query, Store, StoreConfig } from '@datorama/akita';
+import { createFeatureSelector, createSelector, FeatureStore } from 'mini-rx-store';
 
 export interface UserState {
     maskUserName: boolean;
@@ -13,25 +13,20 @@ const initialState: UserState = {
     currentUser: null,
 };
 
-@Injectable({ providedIn: 'root' })
-export class UserQuery extends Query<UserState> {
-    maskUserName$: Observable<boolean> = this.select((state) => state.maskUserName);
+const getUserFeatureState = createFeatureSelector<UserState>();
+const getMaskUserName = createSelector(getUserFeatureState, (state) => state.maskUserName);
 
-    constructor(store: UserStateFacadeService) {
-        super(store);
-    }
-}
-
-@StoreConfig({ name: 'user' })
 @Injectable({
     providedIn: 'root',
 })
-export class UserStateFacadeService extends Store<UserState> {
+export class UserStateFacadeService extends FeatureStore<UserState> {
+    maskUserName$: Observable<boolean> = this.select(getMaskUserName);
+
     constructor() {
-        super(initialState);
+        super('users', initialState);
     }
 
     maskUserName(): void {
-        this.update((state) => ({ maskUserName: !state.maskUserName }));
+        this.setState((state) => ({ maskUserName: !state.maskUserName }));
     }
 }

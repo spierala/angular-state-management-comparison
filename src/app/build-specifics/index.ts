@@ -1,7 +1,7 @@
-import { AkitaNgDevtools } from '@datorama/akita-ngdevtools';
+import { StoreDevtoolsModule } from 'mini-rx-store-ng';
 
 export const extModules = [
-    AkitaNgDevtools.forRoot({
+    StoreDevtoolsModule.instrument({
         maxAge: 25,
     }),
 ];

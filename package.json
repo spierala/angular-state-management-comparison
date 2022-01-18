@@ -21,10 +21,9 @@
         "@angular/platform-browser": "~13.1.0",
         "@angular/platform-browser-dynamic": "~13.1.0",
         "@angular/router": "~13.1.0",
-        "@datorama/akita": "^7.1.1",
-        "@datorama/akita-ngdevtools": "^7.0.0",
-        "@ngneat/effects-ng": "^1.0.0",
         "bootstrap": "^4.4.1",
+        "mini-rx-store": "^3.0.1",
+        "mini-rx-store-ng": "^2.0.0",
         "rxjs": "~7.4.0",
         "tslib": "^2.3.0",
         "zone.js": "~0.11.4"
