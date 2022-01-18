@@ -22,6 +22,8 @@ Run `npm run build:stats` to let source-map-explorer calculate the bundle size.
 
 [combined] (381.49 KB)
 
+Uses [ts-action](https://github.com/cartant/ts-action) for actions
+
 ### [NgRx Store, Effects](https://ngrx.io/) (13.0.2)
 
 [combined] (393.41 KB)
