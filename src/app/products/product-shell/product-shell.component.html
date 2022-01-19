@@ -1,23 +1,23 @@
 <div class="row">
     <div class="col-md-4">
         <pm-product-list
-            [displayCode]="(productState.displayCode$ | async)!"
-            [products]="(productState.products$ | async)!"
-            [selectedProduct]="(productState.selectedProduct$ | async)!"
-            [errorMessage]="(productState.errorMessage$ | async)!"
-            (displayCodeChanged)="checkChanged()"
-            (initializeNewProduct)="newProduct()"
-            (productWasSelected)="productSelected($any($event))"
+            [displayCode]="(productStoreService.displayCode$ | async)!"
+            [products]="(productStoreService.products$ | async)!"
+            [selectedProduct]="(productStoreService.selectedProduct$ | async)!"
+            [errorMessage]="(productStoreService.errorMessage$ | async)!"
+            (displayCodeChanged)="productStoreService.productCodeToggle$.next()"
+            (initializeNewProduct)="productStoreService.newProductInit$.next()"
+            (productWasSelected)="productStoreService.currentProductSelected$.next($any($event))"
         ></pm-product-list>
     </div>
     <div class="col-md-8">
         <pm-product-edit
-            [selectedProduct]="(productState.selectedProduct$ | async)!"
-            [errorMessage]="(productState.errorMessage$ | async)!"
-            (clearCurrent)="clearProduct()"
-            (update)="updateProduct($any($event))"
-            (delete)="deleteProduct($any($event))"
-            (create)="saveProduct($any($event))"
+            [selectedProduct]="(productStoreService.selectedProduct$ | async)!"
+            [errorMessage]="(productStoreService.errorMessage$ | async)!"
+            (clearCurrent)="productStoreService.currentProductCleared$.next()"
+            (update)="productStoreService.updateProduct$.next($any($event))"
+            (delete)="productStoreService.deleteProduct$.next($any($event))"
+            (create)="productStoreService.createProduct$.next($any($event))"
         ></pm-product-edit>
     </div>
 </div>

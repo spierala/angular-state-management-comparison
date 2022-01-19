@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
+import { createStore, actionSanitizer, stateSanitizer, AdaptCommon } from '@state-adapt/core';
 
 // Imports for loading & configuring the in-memory web api
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
@@ -19,6 +20,12 @@ import { UserModule } from './user/user.module';
 
 import { extModules } from './build-specifics';
 
+// Create the Adapt store:
+const enableReduxDevTools = (window as any).__REDUX_DEVTOOLS_EXTENSION__?.({
+    actionSanitizer,
+    stateSanitizer,
+});
+
 @NgModule({
     imports: [
         BrowserModule,
@@ -35,6 +42,7 @@ import { extModules } from './build-specifics';
         WelcomeComponent,
         PageNotFoundComponent,
     ],
+    providers: [{ provide: AdaptCommon, useValue: createStore(enableReduxDevTools) }],
     bootstrap: [AppComponent],
 })
 export class AppModule {}

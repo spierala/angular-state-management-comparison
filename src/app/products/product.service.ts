@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable, throwError } from 'rxjs';
-import { catchError, tap, map } from 'rxjs/operators';
+import { catchError, tap, map, mapTo } from 'rxjs/operators';
 
 import { Product } from './product';
 
@@ -31,11 +31,12 @@ export class ProductService {
         );
     }
 
-    deleteProduct(id: number): Observable<{}> {
+    deleteProduct(id: number): Observable<number> {
         const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
         const url = `${this.productsUrl}/${id}`;
         return this.http.delete<Product>(url, { headers }).pipe(
             tap((data) => console.log('deleteProduct: ' + id)),
+            mapTo(id),
             catchError(this.handleError)
         );
     }

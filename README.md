@@ -10,6 +10,10 @@ Run `npm run build:stats` to let source-map-explorer calculate the bundle size.
 
 ## Results:
 
+### [StateAdapt](https://state-adapt.github.io/) (0.40.0)
+
+[combined] (378.13 KB)
+
 ### [MiniRx Store](https://mini-rx.io/) (3.0.1)
 
 [combined] (381.49 KB)

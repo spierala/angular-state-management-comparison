@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
-import { UserStateFacadeService } from './state/user-state-facade.service';
+import { UserStoreService } from './state/user.store.service';
 
 @Component({
     templateUrl: './login.component.html',
@@ -13,7 +13,7 @@ export class LoginComponent implements OnInit {
 
     constructor(
         private authService: AuthService,
-        public userStateFacade: UserStateFacadeService,
+        public userStoreService: UserStoreService,
         private router: Router
     ) {}
 
@@ -21,10 +21,6 @@ export class LoginComponent implements OnInit {
 
     cancel(): void {
         this.router.navigate(['welcome']);
-    }
-
-    checkChanged(): void {
-        this.userStateFacade.maskUserName();
     }
 
     login(loginForm: NgForm): void {
