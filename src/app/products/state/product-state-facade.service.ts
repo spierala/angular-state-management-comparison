@@ -1,8 +1,10 @@
-import { Injectable } from '@angular/core';
-import { catchError, concatMap, EMPTY, mergeMap, Observable, tap } from 'rxjs';
+import { ChangeDetectorRef, Injectable } from '@angular/core';
+import { snapshot, State } from 'ngx-bang';
+import { asyncEffect } from 'ngx-bang/async';
+import { catchError, concatMap, EMPTY, mergeMap, of, Subject, tap } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
-import { ComponentStore } from '@ngrx/component-store';
 
 export interface ProductState {
     showProductCode: boolean;
@@ -18,135 +20,147 @@ const initialState: ProductState = {
     error: '',
 };
 
-@Injectable({
-    providedIn: 'root',
-})
-export class ProductStateFacadeService extends ComponentStore<ProductState> {
-    displayCode$: Observable<boolean> = this.select((state) => state.showProductCode);
-    selectedProduct$: Observable<Product | undefined | null> = this.select((state) => {
-        if (state.currentProductId === 0) {
-            return {
-                id: 0,
-                productName: '',
-                productCode: 'New',
-                description: '',
-                starRating: 0,
-            };
-        } else {
-            return state.currentProductId
-                ? state.products.find((p) => p.id === state.currentProductId)
+@Injectable()
+export class ProductStateFacadeService extends State<ProductState> {
+    private $loadProducts = new Subject<void>();
+    private $deleteProduct = new Subject<Product>();
+    private $createProduct = new Subject<Product>();
+    private $updateProduct = new Subject<Product>();
+
+    readonly deleteProduct = this.$deleteProduct.next.bind(this.$deleteProduct);
+    readonly createProduct = this.$createProduct.next.bind(this.$createProduct);
+    readonly updateProduct = this.$updateProduct.next.bind(this.$updateProduct);
+
+    derive = this.createDerive<{ selectedProduct: Product | null }>({
+        selectedProduct: (get) => {
+            const { currentProductId, products } = get(this.state);
+            if (currentProductId === 0) {
+                return {
+                    id: currentProductId,
+                    productName: '',
+                    productCode: 'New',
+                    description: '',
+                    starRating: 0,
+                };
+            }
+
+            return currentProductId
+                ? products.find((product) => product.id === currentProductId)!
                 : null;
-        }
+        },
     });
-    products$: Observable<Product[]> = this.select((state) => state.products);
-    errorMessage$: Observable<string> = this.select((state) => state.error);
 
+    get derived() {
+        return snapshot(this.derive);
+    }
 
-    constructor(private productService: ProductService) {
-        super(initialState);
+    constructor(cdr: ChangeDetectorRef, private productService: ProductService) {
+        super(cdr, initialState);
+    }
+
+    init() {
+        this.setupEffects();
+        this.$loadProducts.next();
     }
 
     toggleProductCode(): void {
-        this.patchState((state) => ({ showProductCode: !state.showProductCode }));
+        this.state.showProductCode = !this.snapshot.showProductCode;
     }
 
     initializeCurrentProduct(): void {
-        this.patchState({ currentProductId: 0 });
+        this.state.currentProductId = 0;
     }
 
     setCurrentProduct(product: Product): void {
-        this.patchState({ currentProductId: product.id });
+        this.state.currentProductId = product.id;
     }
 
     clearCurrentProduct(): void {
-        this.patchState({ currentProductId: null });
+        this.state.currentProductId = null;
     }
 
-    loadProducts = this.effect<void>(
-        mergeMap(() =>
-            this.productService.getProducts().pipe(
-                tap((products) => {
-                    this.patchState({
-                        products,
-                        error: '',
-                    });
-                }),
-                catchError((error) => {
-                    this.patchState({
-                        products: [],
-                        error,
-                    });
-                    return EMPTY;
-                })
-            )
-        )
-    );
+    private setupEffects() {
+        asyncEffect(
+            this.state,
+            this.$loadProducts.pipe(
+                mergeMap(() =>
+                    this.productService.getProducts().pipe(
+                        map((products) => ({ products, error: '' })),
+                        catchError((error) => of({ products: [] as Product[], error }))
+                    )
+                )
+            ),
+            ({ products, error }) => {
+                this.state.products = products;
+                this.state.error = error;
+            }
+        );
 
-    deleteProduct = this.effect<Product>(
-        mergeMap((productToDelete: Product) =>
-            this.productService.deleteProduct(productToDelete.id!).pipe(
-                tap((products) => {
-                    this.patchState((state) => ({
-                        products: state.products.filter(
-                            (product) => product.id !== productToDelete.id
-                        ),
-                        currentProductId: null,
-                        error: '',
-                    }));
-                }),
-                catchError((error) => {
-                    this.patchState({
-                        error,
-                    });
-                    return EMPTY;
-                })
+        asyncEffect(
+            this.state,
+            this.$deleteProduct.pipe(
+                mergeMap((productToDelete: Product) =>
+                    this.productService.deleteProduct(productToDelete.id!).pipe(
+                        tap(() => {
+                            const productToDeleteIndex = this.snapshot.products.findIndex(
+                                (product) => product.id === productToDelete.id
+                            );
+                            if (productToDeleteIndex >= 0) {
+                                this.state.products.splice(productToDeleteIndex, 1);
+                                this.state.currentProductId = null;
+                                this.state.error = '';
+                            }
+                        }),
+                        catchError((error) => {
+                            this.state.error = error;
+                            return EMPTY;
+                        })
+                    )
+                )
             )
-        )
-    );
+        );
 
-    createProduct = this.effect<Product>(
-        concatMap((productToCreate) =>
-            this.productService.createProduct(productToCreate).pipe(
-                tap((createdProduct) => {
-                    this.patchState((state) => ({
-                        products: [...state.products, createdProduct],
-                        currentProductId: createdProduct.id,
-                        error: '',
-                    }));
-                }),
-                catchError((error) => {
-                    this.patchState({
-                        error,
-                    });
-                    return EMPTY;
-                })
+        asyncEffect(
+            this.state,
+            this.$createProduct.pipe(
+                concatMap((productToCreate) =>
+                    this.productService.createProduct(productToCreate).pipe(
+                        tap((createdProduct) => {
+                            this.state.products.push(createdProduct);
+                            this.state.currentProductId = createdProduct.id;
+                            this.state.error = '';
+                        }),
+                        catchError((error) => {
+                            this.state.error = error;
+                            return EMPTY;
+                        })
+                    )
+                )
             )
-        )
-    );
+        );
 
-    updateProduct = this.effect<Product>(
-        concatMap((productToUpdate) =>
-            this.productService.updateProduct(productToUpdate).pipe(
-                tap((updatedProduct) => {
-                    this.patchState((state) => {
-                        const updatedProducts = state.products.map((item) =>
-                            productToUpdate.id === item.id ? productToUpdate : item
-                        );
-
-                        return {
-                            products: updatedProducts,
-                            currentProductId: updatedProduct.id,
-                            error: '',
-                        };
-                    });
-                }),
-                catchError((error) => {
-                    this.patchState({
-                        error,
-                    });
-                    return EMPTY;
-                })
+        asyncEffect(
+            this.state,
+            this.$updateProduct.pipe(
+                concatMap((productToUpdate) =>
+                    this.productService.updateProduct(productToUpdate).pipe(
+                        tap((updatedProduct) => {
+                            const updatedProductIndex = this.snapshot.products.findIndex(
+                                (product) => product.id === updatedProduct.id
+                            );
+                            if (updatedProductIndex >= 0) {
+                                this.state.products[updatedProductIndex] = updatedProduct;
+                                this.state.currentProductId = updatedProduct.id;
+                                this.state.error = '';
+                            }
+                        }),
+                        catchError((error) => {
+                            this.state.error = error;
+                            return EMPTY;
+                        })
+                    )
+                )
             )
-        )
-    );
+        );
+    }
 }

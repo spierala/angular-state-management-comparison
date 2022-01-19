@@ -1,23 +1,23 @@
 <div class="row">
     <div class="col-md-4">
         <pm-product-list
-            [displayCode]="(productState.displayCode$ | async)!"
-            [products]="(productState.products$ | async)!"
-            [selectedProduct]="(productState.selectedProduct$ | async)!"
-            [errorMessage]="(productState.errorMessage$ | async)!"
+            [displayCode]="productState.snapshot.showProductCode"
+            [products]="productState.snapshot.products"
+            [selectedProduct]="productState.derived.selectedProduct!"
+            [errorMessage]="productState.snapshot.error"
             (displayCodeChanged)="checkChanged()"
             (initializeNewProduct)="newProduct()"
-            (productWasSelected)="productSelected($any($event))"
+            (productWasSelected)="productSelected($event)"
         ></pm-product-list>
     </div>
     <div class="col-md-8">
         <pm-product-edit
-            [selectedProduct]="(productState.selectedProduct$ | async)!"
-            [errorMessage]="(productState.errorMessage$ | async)!"
+            [selectedProduct]="productState.derived.selectedProduct!"
+            [errorMessage]="productState.snapshot.error!"
             (clearCurrent)="clearProduct()"
-            (update)="updateProduct($any($event))"
-            (delete)="deleteProduct($any($event))"
-            (create)="saveProduct($any($event))"
+            (update)="updateProduct($event)"
+            (delete)="deleteProduct($event)"
+            (create)="saveProduct($event)"
         ></pm-product-edit>
     </div>
 </div>

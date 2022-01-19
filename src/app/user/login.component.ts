@@ -7,6 +7,7 @@ import { UserStateFacadeService } from './state/user-state-facade.service';
 @Component({
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css'],
+    providers: [UserStateFacadeService],
 })
 export class LoginComponent implements OnInit {
     pageTitle = 'Log In';
