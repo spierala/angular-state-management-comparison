@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { catchError, concatMap, EMPTY, mergeMap, Observable, tap } from 'rxjs';
+import { catchError, concatMap, EMPTY, mergeMap, Observable, Subject, tap } from 'rxjs';
+import { StateService } from 'src/app/state.service';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
-import { ComponentStore } from '@ngrx/component-store';
 
 export interface ProductState {
     showProductCode: boolean;
@@ -21,7 +21,7 @@ const initialState: ProductState = {
 @Injectable({
     providedIn: 'root',
 })
-export class ProductStateFacadeService extends ComponentStore<ProductState> {
+export class ProductStateFacadeService extends StateService<ProductState> {
     displayCode$: Observable<boolean> = this.select((state) => state.showProductCode);
     selectedProduct$: Observable<Product | undefined | null> = this.select((state) => {
         if (state.currentProductId === 0) {
@@ -41,112 +41,122 @@ export class ProductStateFacadeService extends ComponentStore<ProductState> {
     products$: Observable<Product[]> = this.select((state) => state.products);
     errorMessage$: Observable<string> = this.select((state) => state.error);
 
+    loadProductsSource: Subject<void> = new Subject();
+    deleteProductSource: Subject<Product> = new Subject();
+    createProductSource: Subject<Product> = new Subject();
+    updateProductSource: Subject<Product> = new Subject();
 
     constructor(private productService: ProductService) {
         super(initialState);
+
+        this.loadProductsSource
+            .pipe(
+                mergeMap(() =>
+                    this.productService.getProducts().pipe(
+                        tap((products) => {
+                            this.setState({
+                                products,
+                                error: '',
+                            });
+                        }),
+                        catchError((error) => {
+                            this.setState({
+                                products: [],
+                                error,
+                            });
+                            return EMPTY;
+                        })
+                    )
+                )
+            )
+            .subscribe();
+
+        this.deleteProductSource
+            .pipe(
+                mergeMap((productToDelete: Product) =>
+                    this.productService.deleteProduct(productToDelete.id!).pipe(
+                        tap((products) => {
+                            this.setState({
+                                products: this.state.products.filter(
+                                    (product) => product.id !== productToDelete.id
+                                ),
+                                currentProductId: null,
+                                error: '',
+                            });
+                        }),
+                        catchError((error) => {
+                            this.setState({
+                                error,
+                            });
+                            return EMPTY;
+                        })
+                    )
+                )
+            )
+            .subscribe();
+
+        this.createProductSource
+            .pipe(
+                concatMap((productToCreate) =>
+                    this.productService.createProduct(productToCreate).pipe(
+                        tap((createdProduct) => {
+                            this.setState({
+                                products: [...this.state.products, createdProduct],
+                                currentProductId: createdProduct.id,
+                                error: '',
+                            });
+                        }),
+                        catchError((error) => {
+                            this.setState({
+                                error,
+                            });
+                            return EMPTY;
+                        })
+                    )
+                )
+            )
+            .subscribe();
+
+        this.updateProductSource
+            .pipe(
+                concatMap((productToUpdate) =>
+                    this.productService.updateProduct(productToUpdate).pipe(
+                        tap((updatedProduct) => {
+                            const updatedProducts = this.state.products.map((item) =>
+                                productToUpdate.id === item.id ? productToUpdate : item
+                            );
+
+                            this.setState({
+                                products: updatedProducts,
+                                currentProductId: updatedProduct.id,
+                                error: '',
+                            });
+                        }),
+                        catchError((error) => {
+                            this.setState({
+                                error,
+                            });
+                            return EMPTY;
+                        })
+                    )
+                )
+            )
+            .subscribe();
     }
 
     toggleProductCode(): void {
-        this.patchState((state) => ({ showProductCode: !state.showProductCode }));
+        this.setState({ showProductCode: !this.state.showProductCode });
     }
 
     initializeCurrentProduct(): void {
-        this.patchState({ currentProductId: 0 });
+        this.setState({ currentProductId: 0 });
     }
 
     setCurrentProduct(product: Product): void {
-        this.patchState({ currentProductId: product.id });
+        this.setState({ currentProductId: product.id });
     }
 
     clearCurrentProduct(): void {
-        this.patchState({ currentProductId: null });
+        this.setState({ currentProductId: null });
     }
-
-    loadProducts = this.effect<void>(
-        mergeMap(() =>
-            this.productService.getProducts().pipe(
-                tap((products) => {
-                    this.patchState({
-                        products,
-                        error: '',
-                    });
-                }),
-                catchError((error) => {
-                    this.patchState({
-                        products: [],
-                        error,
-                    });
-                    return EMPTY;
-                })
-            )
-        )
-    );
-
-    deleteProduct = this.effect<Product>(
-        mergeMap((productToDelete: Product) =>
-            this.productService.deleteProduct(productToDelete.id!).pipe(
-                tap((products) => {
-                    this.patchState((state) => ({
-                        products: state.products.filter(
-                            (product) => product.id !== productToDelete.id
-                        ),
-                        currentProductId: null,
-                        error: '',
-                    }));
-                }),
-                catchError((error) => {
-                    this.patchState({
-                        error,
-                    });
-                    return EMPTY;
-                })
-            )
-        )
-    );
-
-    createProduct = this.effect<Product>(
-        concatMap((productToCreate) =>
-            this.productService.createProduct(productToCreate).pipe(
-                tap((createdProduct) => {
-                    this.patchState((state) => ({
-                        products: [...state.products, createdProduct],
-                        currentProductId: createdProduct.id,
-                        error: '',
-                    }));
-                }),
-                catchError((error) => {
-                    this.patchState({
-                        error,
-                    });
-                    return EMPTY;
-                })
-            )
-        )
-    );
-
-    updateProduct = this.effect<Product>(
-        concatMap((productToUpdate) =>
-            this.productService.updateProduct(productToUpdate).pipe(
-                tap((updatedProduct) => {
-                    this.patchState((state) => {
-                        const updatedProducts = state.products.map((item) =>
-                            productToUpdate.id === item.id ? productToUpdate : item
-                        );
-
-                        return {
-                            products: updatedProducts,
-                            currentProductId: updatedProduct.id,
-                            error: '',
-                        };
-                    });
-                }),
-                catchError((error) => {
-                    this.patchState({
-                        error,
-                    });
-                    return EMPTY;
-                })
-            )
-        )
-    );
 }

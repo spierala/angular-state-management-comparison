@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { StateService } from 'src/app/state.service';
 import { User } from '../user';
-import { ComponentStore } from '@ngrx/component-store';
 
 export interface UserState {
     maskUserName: boolean;
@@ -16,14 +16,14 @@ const initialState: UserState = {
 @Injectable({
     providedIn: 'root',
 })
-export class UserStateFacadeService extends ComponentStore<UserState> {
-    maskUserName$: Observable<boolean> = this.select(state => state.maskUserName);
+export class UserStateFacadeService extends StateService<UserState> {
+    maskUserName$: Observable<boolean> = this.select((state) => state.maskUserName);
 
     constructor() {
         super(initialState);
     }
 
     maskUserName(): void {
-        this.patchState((state) => ({ maskUserName: !state.maskUserName }));
+        this.setState({ maskUserName: !this.state.maskUserName });
     }
 }
