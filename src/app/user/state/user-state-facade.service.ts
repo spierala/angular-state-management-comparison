@@ -1,5 +1,5 @@
-import { ApplicationRef, ChangeDetectorRef, Injectable } from '@angular/core';
-import { State } from 'ngx-bang';
+import { Injectable } from '@angular/core';
+import { snapshot, state } from 'ngx-bang';
 import { User } from '../user';
 
 export interface UserState {
@@ -7,18 +7,14 @@ export interface UserState {
     currentUser: User | null;
 }
 
-const initialState: UserState = {
-    maskUserName: true,
-    currentUser: null,
-};
-
 @Injectable()
-export class UserStateFacadeService extends State<UserState> {
-    constructor(cdr: ChangeDetectorRef) {
-        super(cdr, initialState);
-    }
+export class UserStateFacadeService {
+    readonly state = state<UserState>({
+        maskUserName: true,
+        currentUser: null,
+    });
 
     maskUserName() {
-        this.state.maskUserName = !this.snapshot.maskUserName;
+        this.state.maskUserName = !snapshot(this.state).maskUserName;
     }
 }

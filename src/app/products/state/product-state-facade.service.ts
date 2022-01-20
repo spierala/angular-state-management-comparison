@@ -1,7 +1,7 @@
-import { ChangeDetectorRef, Injectable } from '@angular/core';
-import { snapshot, State } from 'ngx-bang';
-import { asyncEffect } from 'ngx-bang/async';
-import { catchError, concatMap, EMPTY, mergeMap, of, Subject, tap } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { derive, snapshot, state } from 'ngx-bang';
+import { asyncActions, asyncEffect } from 'ngx-bang/async';
+import { catchError, concatMap, EMPTY, mergeMap, of, tap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
@@ -13,25 +13,22 @@ export interface ProductState {
     error: string;
 }
 
-const initialState: ProductState = {
-    showProductCode: true,
-    currentProductId: null,
-    products: [],
-    error: '',
-};
-
 @Injectable()
-export class ProductStateFacadeService extends State<ProductState> {
-    private $loadProducts = new Subject<void>();
-    private $deleteProduct = new Subject<Product>();
-    private $createProduct = new Subject<Product>();
-    private $updateProduct = new Subject<Product>();
+export class ProductStateFacadeService {
+    readonly state = state<ProductState>({
+        showProductCode: true,
+        currentProductId: null,
+        products: [],
+        error: '',
+    });
 
-    readonly deleteProduct = this.$deleteProduct.next.bind(this.$deleteProduct);
-    readonly createProduct = this.$createProduct.next.bind(this.$createProduct);
-    readonly updateProduct = this.$updateProduct.next.bind(this.$updateProduct);
+    readonly actions = asyncActions<{
+        createProduct: Product;
+        updateProduct: Product;
+        deleteProduct: Product;
+    }>();
 
-    derive = this.createDerive<{ selectedProduct: Product | null }>({
+    readonly derive = derive<{ selectedProduct: Product | null }>({
         selectedProduct: (get) => {
             const { currentProductId, products } = get(this.state);
             if (currentProductId === 0) {
@@ -54,41 +51,14 @@ export class ProductStateFacadeService extends State<ProductState> {
         return snapshot(this.derive);
     }
 
-    constructor(cdr: ChangeDetectorRef, private productService: ProductService) {
-        super(cdr, initialState);
-    }
+    constructor(private productService: ProductService) {}
 
-    init() {
-        this.setupEffects();
-        this.$loadProducts.next();
-    }
-
-    toggleProductCode(): void {
-        this.state.showProductCode = !this.snapshot.showProductCode;
-    }
-
-    initializeCurrentProduct(): void {
-        this.state.currentProductId = 0;
-    }
-
-    setCurrentProduct(product: Product): void {
-        this.state.currentProductId = product.id;
-    }
-
-    clearCurrentProduct(): void {
-        this.state.currentProductId = null;
-    }
-
-    private setupEffects() {
+    setup() {
         asyncEffect(
             this.state,
-            this.$loadProducts.pipe(
-                mergeMap(() =>
-                    this.productService.getProducts().pipe(
-                        map((products) => ({ products, error: '' })),
-                        catchError((error) => of({ products: [] as Product[], error }))
-                    )
-                )
+            this.productService.getProducts().pipe(
+                map((products) => ({ products, error: '' })),
+                catchError((error) => of({ products: [] as Product[], error }))
             ),
             ({ products, error }) => {
                 this.state.products = products;
@@ -98,11 +68,11 @@ export class ProductStateFacadeService extends State<ProductState> {
 
         asyncEffect(
             this.state,
-            this.$deleteProduct.pipe(
+            this.actions.deleteProduct$.pipe(
                 mergeMap((productToDelete: Product) =>
                     this.productService.deleteProduct(productToDelete.id!).pipe(
                         tap(() => {
-                            const productToDeleteIndex = this.snapshot.products.findIndex(
+                            const productToDeleteIndex = snapshot(this.state).products.findIndex(
                                 (product) => product.id === productToDelete.id
                             );
                             if (productToDeleteIndex >= 0) {
@@ -122,7 +92,7 @@ export class ProductStateFacadeService extends State<ProductState> {
 
         asyncEffect(
             this.state,
-            this.$createProduct.pipe(
+            this.actions.createProduct$.pipe(
                 concatMap((productToCreate) =>
                     this.productService.createProduct(productToCreate).pipe(
                         tap((createdProduct) => {
@@ -141,11 +111,11 @@ export class ProductStateFacadeService extends State<ProductState> {
 
         asyncEffect(
             this.state,
-            this.$updateProduct.pipe(
+            this.actions.updateProduct$.pipe(
                 concatMap((productToUpdate) =>
                     this.productService.updateProduct(productToUpdate).pipe(
                         tap((updatedProduct) => {
-                            const updatedProductIndex = this.snapshot.products.findIndex(
+                            const updatedProductIndex = snapshot(this.state).products.findIndex(
                                 (product) => product.id === updatedProduct.id
                             );
                             if (updatedProductIndex >= 0) {
@@ -162,5 +132,21 @@ export class ProductStateFacadeService extends State<ProductState> {
                 )
             )
         );
+    }
+
+    toggleProductCode(): void {
+        this.state.showProductCode = !snapshot(this.state).showProductCode;
+    }
+
+    initializeCurrentProduct(): void {
+        this.state.currentProductId = 0;
+    }
+
+    setCurrentProduct(product: Product): void {
+        this.state.currentProductId = product.id;
+    }
+
+    clearCurrentProduct(): void {
+        this.state.currentProductId = null;
     }
 }

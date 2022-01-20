@@ -10,7 +10,7 @@ export class ProductShellComponent implements OnInit {
     constructor(public productState: ProductStateFacadeService) {}
 
     ngOnInit(): void {
-        this.productState.init();
+        this.productState.setup();
     }
 
     checkChanged(): void {
@@ -26,7 +26,7 @@ export class ProductShellComponent implements OnInit {
     }
 
     deleteProduct(product: Product): void {
-        this.productState.deleteProduct(product);
+        this.productState.actions.deleteProduct(product);
     }
 
     clearProduct(): void {
@@ -34,10 +34,10 @@ export class ProductShellComponent implements OnInit {
     }
 
     saveProduct(product: Product): void {
-        this.productState.createProduct(product);
+        this.productState.actions.createProduct(product);
     }
 
     updateProduct(product: Product): void {
-        this.productState.updateProduct(product);
+        this.productState.actions.updateProduct(product);
     }
 }
