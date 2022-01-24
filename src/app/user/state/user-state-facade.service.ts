@@ -22,8 +22,6 @@ const userStore = new Store({ state, name: 'user', config });
 export class UserStateFacadeService {
     maskUserName$: Observable<boolean> = userStore.pipe(select((state) => state.maskUserName));
 
-    constructor() {}
-
     maskUserName(): void {
         userStore.update((state) => ({ ...state, maskUserName: !state.maskUserName }));
     }
