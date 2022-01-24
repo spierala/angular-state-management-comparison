@@ -22,6 +22,12 @@ Run `npm run build:stats` to let source-map-explorer calculate the bundle size.
 
 [combined] (374.75 KB)
 
+### [Elf](https://ngneat.github.io/elf/) (1.0.2)
+
+[combined] (379.21 KB)
+
+Uses [ngneat/effects](https://github.com/ngneat/effects) for effects
+
 ### [MiniRx Store (Redux API)](https://mini-rx.io/) (3.0.1)
 
 [combined] (381.49 KB)
