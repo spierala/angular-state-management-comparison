@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { catchError, concatMap, EMPTY, mergeMap, Observable, tap } from 'rxjs';
 import { Product } from '../product';
-import { Query, Store, StoreConfig } from '@datorama/akita';
 import { ProductService } from '../product.service';
 import { createEffectFn } from '@ngneat/effects';
 import { EffectFn } from '@ngneat/effects-ng';
+import { createState, select, Store, withProps } from '@ngneat/elf';
 
 export interface ProductState {
     showProductCode: boolean;
@@ -20,57 +20,71 @@ const initialState: ProductState = {
     error: '',
 };
 
-@Injectable({ providedIn: 'root' })
-export class ProductsQuery extends Query<ProductState> {
-    displayCode$: Observable<boolean> = this.select((state) => state.showProductCode);
-    selectedProduct$: Observable<Product | undefined | null> = this.select((state) => {
-        if (state.currentProductId === 0) {
-            return {
-                id: 0,
-                productName: '',
-                productCode: 'New',
-                description: '',
-                starRating: 0,
-            };
-        } else {
-            return state.currentProductId
-                ? state.products.find((p) => p.id === state.currentProductId)
-                : null;
-        }
-    });
-    products$: Observable<Product[]> = this.select((state) => state.products);
-    errorMessage$: Observable<string> = this.select((state) => state.error);
-
-    constructor(store: ProductStateFacadeService) {
-        super(store);
-    }
-}
+const { state, config } = createState(withProps<ProductState>(initialState));
+const productStore = new Store({ state, name: 'products', config });
 
 @Injectable({
     providedIn: 'root',
 })
-export class ProductEffects extends EffectFn {
-    constructor(
-        private productService: ProductService,
-        private productState: ProductStateFacadeService
-    ) {
+export class ProductStateFacadeService extends EffectFn {
+    displayCode$: Observable<boolean> = productStore.pipe(select((state) => state.showProductCode));
+    selectedProduct$: Observable<Product | undefined | null> = productStore.pipe(
+        select((state) => {
+            if (state.currentProductId === 0) {
+                return {
+                    id: 0,
+                    productName: '',
+                    productCode: 'New',
+                    description: '',
+                    starRating: 0,
+                };
+            } else {
+                return state.currentProductId
+                    ? state.products.find((p) => p.id === state.currentProductId)
+                    : null;
+            }
+        })
+    );
+    products$: Observable<Product[]> = productStore.pipe(select((state) => state.products));
+    errorMessage$: Observable<string> = productStore.pipe(select((state) => state.error));
+
+    constructor(private productService: ProductService) {
         super();
     }
 
+    toggleProductCode(): void {
+        productStore.update((state) => ({ ...state, showProductCode: !state.showProductCode }));
+    }
+
+    initializeCurrentProduct(): void {
+        productStore.update((state) => ({ ...state, currentProductId: 0 }));
+    }
+
+    setCurrentProduct(product: Product): void {
+        productStore.update((state) => ({ ...state, currentProductId: product.id }));
+    }
+
+    clearCurrentProduct(): void {
+        productStore.update((state) => ({ ...state, currentProductId: null }));
+    }
+
+    // Effects
     loadProducts = this.createEffectFn<void>(
         mergeMap(() =>
             this.productService.getProducts().pipe(
                 tap((products) => {
-                    this.productState.update({
+                    productStore.update((state) => ({
+                        ...state,
                         products,
                         error: '',
-                    });
+                    }));
                 }),
                 catchError((error) => {
-                    this.productState.update({
+                    productStore.update((state) => ({
+                        ...state,
                         products: [],
                         error,
-                    });
+                    }));
                     return EMPTY;
                 })
             )
@@ -81,7 +95,7 @@ export class ProductEffects extends EffectFn {
         mergeMap((productToDelete: Product) =>
             this.productService.deleteProduct(productToDelete.id!).pipe(
                 tap((products) => {
-                    this.productState.update((state) => ({
+                    productStore.update((state) => ({
                         ...state,
                         products: state.products.filter(
                             (product) => product.id !== productToDelete.id
@@ -91,9 +105,10 @@ export class ProductEffects extends EffectFn {
                     }));
                 }),
                 catchError((error) => {
-                    this.productState.update({
+                    productStore.update((state) => ({
+                        ...state,
                         error,
-                    });
+                    }));
                     return EMPTY;
                 })
             )
@@ -104,7 +119,7 @@ export class ProductEffects extends EffectFn {
         concatMap((productToCreate) =>
             this.productService.createProduct(productToCreate).pipe(
                 tap((createdProduct) => {
-                    this.productState.update((state) => ({
+                    productStore.update((state) => ({
                         ...state,
                         products: [...state.products, createdProduct],
                         currentProductId: createdProduct.id,
@@ -112,9 +127,10 @@ export class ProductEffects extends EffectFn {
                     }));
                 }),
                 catchError((error) => {
-                    this.productState.update({
+                    productStore.update((state) => ({
+                        ...state,
                         error,
-                    });
+                    }));
                     return EMPTY;
                 })
             )
@@ -125,12 +141,13 @@ export class ProductEffects extends EffectFn {
         concatMap((productToUpdate) =>
             this.productService.updateProduct(productToUpdate).pipe(
                 tap((updatedProduct) => {
-                    this.productState.update((state) => {
+                    productStore.update((state) => {
                         const updatedProducts = state.products.map((item) =>
                             productToUpdate.id === item.id ? productToUpdate : item
                         );
 
                         return {
+                            ...state,
                             products: updatedProducts,
                             currentProductId: updatedProduct.id,
                             error: '',
@@ -138,38 +155,13 @@ export class ProductEffects extends EffectFn {
                     });
                 }),
                 catchError((error) => {
-                    this.productState.update({
+                    productStore.update((state) => ({
+                        ...state,
                         error,
-                    });
+                    }));
                     return EMPTY;
                 })
             )
         )
     );
-}
-
-@StoreConfig({ name: 'products' })
-@Injectable({
-    providedIn: 'root',
-})
-export class ProductStateFacadeService extends Store<ProductState> {
-    constructor(private productService: ProductService) {
-        super(initialState);
-    }
-
-    toggleProductCode(): void {
-        this.update((state) => ({ showProductCode: !state.showProductCode }));
-    }
-
-    initializeCurrentProduct(): void {
-        this.update({ currentProductId: 0 });
-    }
-
-    setCurrentProduct(product: Product): void {
-        this.update({ currentProductId: product.id });
-    }
-
-    clearCurrentProduct(): void {
-        this.update({ currentProductId: null });
-    }
 }

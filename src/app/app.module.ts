@@ -17,8 +17,6 @@ import { PageNotFoundComponent } from './home/page-not-found.component';
 /* Feature Modules */
 import { UserModule } from './user/user.module';
 
-import { extModules } from './build-specifics';
-
 @NgModule({
     imports: [
         BrowserModule,
@@ -26,7 +24,6 @@ import { extModules } from './build-specifics';
         HttpClientInMemoryWebApiModule.forRoot(ProductData),
         UserModule,
         AppRoutingModule,
-        extModules,
     ],
     declarations: [
         AppComponent,

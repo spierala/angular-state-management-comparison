@@ -1,7 +1,3 @@
-import { AkitaNgDevtools } from '@datorama/akita-ngdevtools';
+import { devTools } from '@ngneat/elf-devtools';
 
-export const extModules = [
-    AkitaNgDevtools.forRoot({
-        maxAge: 25,
-    }),
-];
+export const elfDevTools = devTools; // Do nothing in prod

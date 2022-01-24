@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
-import { UserQuery, UserStateFacadeService } from './state/user-state-facade.service';
+import { UserStateFacadeService } from './state/user-state-facade.service';
 
 @Component({
     templateUrl: './login.component.html',
@@ -14,7 +14,6 @@ export class LoginComponent implements OnInit {
     constructor(
         private authService: AuthService,
         public userStateFacade: UserStateFacadeService,
-        public userQuery: UserQuery,
         private router: Router
     ) {}
 

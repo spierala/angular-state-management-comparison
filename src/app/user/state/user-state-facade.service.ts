@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../user';
-import { Query, Store, StoreConfig } from '@datorama/akita';
+import { createState, select, Store, withProps } from '@ngneat/elf';
 
 export interface UserState {
     maskUserName: boolean;
@@ -13,25 +13,18 @@ const initialState: UserState = {
     currentUser: null,
 };
 
-@Injectable({ providedIn: 'root' })
-export class UserQuery extends Query<UserState> {
-    maskUserName$: Observable<boolean> = this.select((state) => state.maskUserName);
+const { state, config } = createState(withProps<UserState>(initialState));
+const userStore = new Store({ state, name: 'user', config });
 
-    constructor(store: UserStateFacadeService) {
-        super(store);
-    }
-}
-
-@StoreConfig({ name: 'user' })
 @Injectable({
     providedIn: 'root',
 })
-export class UserStateFacadeService extends Store<UserState> {
-    constructor() {
-        super(initialState);
-    }
+export class UserStateFacadeService {
+    maskUserName$: Observable<boolean> = userStore.pipe(select((state) => state.maskUserName));
+
+    constructor() {}
 
     maskUserName(): void {
-        this.update((state) => ({ maskUserName: !state.maskUserName }));
+        userStore.update((state) => ({ ...state, maskUserName: !state.maskUserName }));
     }
 }
