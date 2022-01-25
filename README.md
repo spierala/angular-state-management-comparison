@@ -10,9 +10,9 @@ Run `npm run build:stats` to let source-map-explorer calculate the bundle size.
 
 ## Results:
 
-### [ngx-bang](https://github.com/nartc/nartc-workspace/tree/main/packages/ngx-bang) (1.0.0-beta.17)
+### [ngx-bang](https://github.com/nartc/nartc-workspace/tree/main/packages/ngx-bang) (1.0.0)
 
-[combined] (370.06 KB)
+[combined] (371.57 KB)
 
 ### [NgRx Component Store](https://ngrx.io/guide/component-store) (13.0.2)
 
