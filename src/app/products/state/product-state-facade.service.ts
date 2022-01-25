@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { derive, snapshot, state } from 'ngx-bang';
 import { asyncActions, asyncEffect } from 'ngx-bang/async';
-import { catchError, concatMap, EMPTY, mergeMap, of, tap } from 'rxjs';
+import { catchError, concatMap, EMPTY, mapTo, mergeMap, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
@@ -71,23 +71,24 @@ export class ProductStateFacadeService {
             this.actions.deleteProduct$.pipe(
                 mergeMap((productToDelete: Product) =>
                     this.productService.deleteProduct(productToDelete.id!).pipe(
-                        tap(() => {
-                            const productToDeleteIndex = snapshot(this.state).products.findIndex(
-                                (product) => product.id === productToDelete.id
-                            );
-                            if (productToDeleteIndex >= 0) {
-                                this.state.products.splice(productToDeleteIndex, 1);
-                                this.state.currentProductId = null;
-                                this.state.error = '';
-                            }
-                        }),
+                        mapTo(productToDelete.id),
                         catchError((error) => {
                             this.state.error = error;
                             return EMPTY;
                         })
                     )
                 )
-            )
+            ),
+            (deletedId) => {
+                const productToDeleteIndex = snapshot(this.state).products.findIndex(
+                    (product) => product.id === deletedId
+                );
+                if (productToDeleteIndex >= 0) {
+                    this.state.products.splice(productToDeleteIndex, 1);
+                    this.state.currentProductId = null;
+                    this.state.error = '';
+                }
+            }
         );
 
         asyncEffect(
@@ -95,18 +96,18 @@ export class ProductStateFacadeService {
             this.actions.createProduct$.pipe(
                 concatMap((productToCreate) =>
                     this.productService.createProduct(productToCreate).pipe(
-                        tap((createdProduct) => {
-                            this.state.products.push(createdProduct);
-                            this.state.currentProductId = createdProduct.id;
-                            this.state.error = '';
-                        }),
                         catchError((error) => {
                             this.state.error = error;
                             return EMPTY;
                         })
                     )
                 )
-            )
+            ),
+            (createdProduct) => {
+                this.state.products.push(createdProduct);
+                this.state.currentProductId = createdProduct.id;
+                this.state.error = '';
+            }
         );
 
         asyncEffect(
@@ -114,23 +115,23 @@ export class ProductStateFacadeService {
             this.actions.updateProduct$.pipe(
                 concatMap((productToUpdate) =>
                     this.productService.updateProduct(productToUpdate).pipe(
-                        tap((updatedProduct) => {
-                            const updatedProductIndex = snapshot(this.state).products.findIndex(
-                                (product) => product.id === updatedProduct.id
-                            );
-                            if (updatedProductIndex >= 0) {
-                                this.state.products[updatedProductIndex] = updatedProduct;
-                                this.state.currentProductId = updatedProduct.id;
-                                this.state.error = '';
-                            }
-                        }),
                         catchError((error) => {
                             this.state.error = error;
                             return EMPTY;
                         })
                     )
                 )
-            )
+            ),
+            (updatedProduct) => {
+                const updatedProductIndex = snapshot(this.state).products.findIndex(
+                    (product) => product.id === updatedProduct.id
+                );
+                if (updatedProductIndex >= 0) {
+                    this.state.products[updatedProductIndex] = updatedProduct;
+                    this.state.currentProductId = updatedProduct.id;
+                    this.state.error = '';
+                }
+            }
         );
     }
 
