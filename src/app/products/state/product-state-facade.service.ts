@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { catchError, concatMap, EMPTY, mergeMap, Observable, tap } from 'rxjs';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
-import { createFeatureSelector, createSelector, FeatureStore } from 'mini-rx-store';
+import { FeatureStore } from 'mini-rx-store';
 
 export interface ProductState {
     showProductCode: boolean;
@@ -18,20 +18,13 @@ const initialState: ProductState = {
     error: '',
 };
 
-const getProductFeatureState = createFeatureSelector<ProductState>();
-export const getShowProductCode = createSelector(
-    getProductFeatureState,
-    (state) => state.showProductCode
-);
-export const getCurrentProductId = createSelector(
-    getProductFeatureState,
-    (state) => state.currentProductId
-);
-export const getCurrentProduct = createSelector(
-    getProductFeatureState,
-    getCurrentProductId,
-    (state, currentProductId) => {
-        if (currentProductId === 0) {
+@Injectable({
+    providedIn: 'root',
+})
+export class ProductStateFacadeService extends FeatureStore<ProductState> {
+    displayCode$: Observable<boolean> = this.select((state) => state.showProductCode);
+    selectedProduct$: Observable<Product | undefined | null> = this.select((state) => {
+        if (state.currentProductId === 0) {
             return {
                 id: 0,
                 productName: '',
@@ -40,21 +33,13 @@ export const getCurrentProduct = createSelector(
                 starRating: 0,
             };
         } else {
-            return currentProductId ? state.products.find((p) => p.id === currentProductId) : null;
+            return state.currentProductId
+                ? state.products.find((p) => p.id === state.currentProductId)
+                : null;
         }
-    }
-);
-export const getProducts = createSelector(getProductFeatureState, (state) => state.products);
-export const getError = createSelector(getProductFeatureState, (state) => state.error);
-
-@Injectable({
-    providedIn: 'root',
-})
-export class ProductStateFacadeService extends FeatureStore<ProductState> {
-    displayCode$: Observable<boolean> = this.select(getShowProductCode);
-    selectedProduct$: Observable<Product | undefined | null> = this.select(getCurrentProduct);
-    products$: Observable<Product[]> = this.select(getProducts);
-    errorMessage$: Observable<string> = this.select(getError);
+    });
+    products$: Observable<Product[]> = this.select((state) => state.products);
+    errorMessage$: Observable<string> = this.select((state) => state.error);
 
     constructor(private productService: ProductService) {
         super('products', initialState);
