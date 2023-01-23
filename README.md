@@ -14,6 +14,10 @@ Run `npm run build:stats` to let source-map-explorer calculate the bundle size.
 
 [combined] (365.93 KB)
 
+### [MiniRx Store (Component Store API)](https://mini-rx.io/) (5.0.0-alpha.0)
+
+[combined] (372.41 KB)
+
 ### [NgRx Component Store](https://ngrx.io/guide/component-store) (13.0.2)
 
 [combined] (373.44 KB)
