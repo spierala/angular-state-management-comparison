@@ -14,6 +14,14 @@ Run `npm run build:stats` to let source-map-explorer calculate the bundle size.
 
 [combined] (365.93 KB)
 
+### [MiniRx Store (Component Store API)](https://mini-rx.io/) (5.0.0-alpha.2)
+
+[combined] (372.48 KB)
+
+### [MiniRx Store (Feature Store API)](https://mini-rx.io/) (5.0.0-alpha.2)
+
+[combined] (373.12 KB)
+
 ### [NgRx Component Store](https://ngrx.io/guide/component-store) (13.0.2)
 
 [combined] (373.44 KB)
@@ -28,9 +36,13 @@ Run `npm run build:stats` to let source-map-explorer calculate the bundle size.
 
 Uses [ngneat/effects](https://github.com/ngneat/effects) for effects
 
+### [MiniRx Store (Redux API)](https://mini-rx.io/) (5.0.0-alpha.2)
+
+[combined] (379.35 KB)
+
 ### [MiniRx Store (Redux API)](https://mini-rx.io/) (3.0.1)
 
-[combined] (381.49 KB)
+[combined] (381.49)
 
 Uses [ts-action](https://github.com/cartant/ts-action) for actions
 
