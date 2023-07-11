@@ -1,6 +1,6 @@
 import { Injectable, Signal } from '@angular/core';
 import { User } from '../user';
-import { FeatureStore } from '@mini-rx/signal-store';
+import { ComponentStore } from '@mini-rx/signal-store';
 
 export interface UserState {
     maskUserName: boolean;
@@ -15,11 +15,11 @@ const initialState: UserState = {
 @Injectable({
     providedIn: 'root',
 })
-export class UserStateFacadeService extends FeatureStore<UserState> {
+export class UserStateFacadeService extends ComponentStore<UserState> {
     maskUserName$: Signal<boolean> = this.select((state) => state.maskUserName);
 
     constructor() {
-        super('users', initialState);
+        super(initialState);
     }
 
     maskUserName(): void {
