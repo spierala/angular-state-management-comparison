@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { catchError, concatMap, EMPTY, mergeMap, Observable, tap } from 'rxjs';
+import { Injectable, Signal } from '@angular/core';
+import { catchError, concatMap, EMPTY, mergeMap, tap } from 'rxjs';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
 import { ComponentStore } from '@ngrx/component-store';
@@ -22,8 +22,8 @@ const initialState: ProductState = {
     providedIn: 'root',
 })
 export class ProductStateFacadeService extends ComponentStore<ProductState> {
-    displayCode$: Observable<boolean> = this.select((state) => state.showProductCode);
-    selectedProduct$: Observable<Product | undefined | null> = this.select((state) => {
+    displayCode$: Signal<boolean> = this.selectSignal((state) => state.showProductCode);
+    selectedProduct$: Signal<Product | undefined | null> = this.selectSignal((state) => {
         if (state.currentProductId === 0) {
             return {
                 id: 0,
@@ -38,9 +38,8 @@ export class ProductStateFacadeService extends ComponentStore<ProductState> {
                 : null;
         }
     });
-    products$: Observable<Product[]> = this.select((state) => state.products);
-    errorMessage$: Observable<string> = this.select((state) => state.error);
-
+    products$: Signal<Product[]> = this.selectSignal((state) => state.products);
+    errorMessage$: Signal<string> = this.selectSignal((state) => state.error);
 
     constructor(private productService: ProductService) {
         super(initialState);

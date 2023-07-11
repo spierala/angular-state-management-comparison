@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Injectable, Signal } from '@angular/core';
 import { User } from '../user';
 import { ComponentStore } from '@ngrx/component-store';
 
@@ -17,7 +16,7 @@ const initialState: UserState = {
     providedIn: 'root',
 })
 export class UserStateFacadeService extends ComponentStore<UserState> {
-    maskUserName$: Observable<boolean> = this.select(state => state.maskUserName);
+    maskUserName$: Signal<boolean> = this.selectSignal((state) => state.maskUserName);
 
     constructor() {
         super(initialState);
