@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { catchError, concatMap, EMPTY, mergeMap, Observable, tap } from 'rxjs';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
-import { FeatureStore } from 'mini-rx-store';
+import { ComponentStore } from 'mini-rx-store';
 
 export interface ProductState {
     showProductCode: boolean;
@@ -21,7 +21,7 @@ const initialState: ProductState = {
 @Injectable({
     providedIn: 'root',
 })
-export class ProductStateFacadeService extends FeatureStore<ProductState> {
+export class ProductStateFacadeService extends ComponentStore<ProductState> {
     displayCode$: Observable<boolean> = this.select((state) => state.showProductCode);
     selectedProduct$: Observable<Product | undefined | null> = this.select((state) => {
         if (state.currentProductId === 0) {
@@ -42,7 +42,7 @@ export class ProductStateFacadeService extends FeatureStore<ProductState> {
     errorMessage$: Observable<string> = this.select((state) => state.error);
 
     constructor(private productService: ProductService) {
-        super('products', initialState);
+        super(initialState);
     }
 
     toggleProductCode(): void {
