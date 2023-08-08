@@ -1,8 +1,8 @@
-import { createFeatureSelector, createSelector } from 'mini-rx-store';
+import { createFeatureStateSelector, createSelector } from '@mini-rx/signal-store';
 import { ProductState } from './product.reducer';
 
 // Selector functions
-const getProductFeatureState = createFeatureSelector<ProductState>('products');
+const getProductFeatureState = createFeatureStateSelector<ProductState>('products');
 
 export const getShowProductCode = createSelector(
     getProductFeatureState,

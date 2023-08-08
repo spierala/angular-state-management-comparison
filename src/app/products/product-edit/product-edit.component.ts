@@ -20,7 +20,7 @@ import { NumberValidators } from '../../shared/number.validator';
 export class ProductEditComponent implements OnInit, OnChanges {
     pageTitle = 'Product Edit';
     @Input() errorMessage: string;
-    @Input() selectedProduct: Product;
+    @Input() selectedProduct: Product | undefined | null;
     @Output() create = new EventEmitter<Product>();
     @Output() update = new EventEmitter<Product>();
     @Output() delete = new EventEmitter<Product>();
@@ -112,7 +112,7 @@ export class ProductEditComponent implements OnInit, OnChanges {
     cancelEdit(): void {
         // Redisplay the currently selected product
         // replacing any edits made
-        this.displayProduct(this.selectedProduct);
+        this.displayProduct(this.selectedProduct!);
     }
 
     deleteProduct(): void {

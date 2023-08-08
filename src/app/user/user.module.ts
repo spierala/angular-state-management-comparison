@@ -5,7 +5,7 @@ import { SharedModule } from '../shared/shared.module';
 
 import { LoginComponent } from './login.component';
 
-import { StoreModule } from 'mini-rx-store-ng';
+import { StoreModule } from '@mini-rx/signal-store';
 import { userReducer } from './state/user.reducer';
 
 const userRoutes: Routes = [{ path: 'login', component: LoginComponent }];

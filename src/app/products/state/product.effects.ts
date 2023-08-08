@@ -5,14 +5,14 @@ import { of } from 'rxjs';
 import { ProductService } from '../product.service';
 
 import { ProductPageActions, ProductApiActions } from './actions';
-import { Actions, createEffect } from 'mini-rx-store';
+import { Actions, createRxEffect } from '@mini-rx/signal-store';
 import { ofType } from 'ts-action-operators';
 
 @Injectable()
 export class ProductEffects {
     constructor(private actions$: Actions, private productService: ProductService) {}
 
-    loadProducts$ = createEffect(
+    loadProducts$ = createRxEffect(
         this.actions$.pipe(
             ofType(ProductPageActions.loadProducts),
             mergeMap(() =>
@@ -24,7 +24,7 @@ export class ProductEffects {
         )
     );
 
-    updateProduct$ = createEffect(
+    updateProduct$ = createRxEffect(
         this.actions$.pipe(
             ofType(ProductPageActions.updateProduct),
             concatMap((action) =>
@@ -36,7 +36,7 @@ export class ProductEffects {
         )
     );
 
-    createProduct$ = createEffect(
+    createProduct$ = createRxEffect(
         this.actions$.pipe(
             ofType(ProductPageActions.createProduct),
             concatMap((action) =>
@@ -48,7 +48,7 @@ export class ProductEffects {
         )
     );
 
-    deleteProduct$ = createEffect(
+    deleteProduct$ = createRxEffect(
         this.actions$.pipe(
             ofType(ProductPageActions.deleteProduct),
             mergeMap((action) =>

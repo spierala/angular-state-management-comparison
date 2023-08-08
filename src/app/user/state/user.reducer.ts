@@ -1,7 +1,7 @@
 // Homework
 import { User } from '../user';
 
-import { createFeatureSelector, createSelector } from 'mini-rx-store';
+import { createFeatureStateSelector, createSelector } from '@mini-rx/signal-store';
 import { reducer as createReducer, on } from 'ts-action';
 import { UserPageActions } from './actions';
 
@@ -17,7 +17,7 @@ const initialState: UserState = {
 };
 
 // Selector functions
-const getUserFeatureState = createFeatureSelector<UserState>('users');
+const getUserFeatureState = createFeatureStateSelector<UserState>('users');
 
 export const getMaskUserName = createSelector(getUserFeatureState, (state) => state.maskUserName);
 

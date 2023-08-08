@@ -18,7 +18,7 @@ import { PageNotFoundComponent } from './home/page-not-found.component';
 import { UserModule } from './user/user.module';
 
 import { extModules } from './build-specifics';
-import { StoreModule } from 'mini-rx-store-ng';
+import { StoreModule } from '@mini-rx/signal-store';
 
 @NgModule({
     imports: [

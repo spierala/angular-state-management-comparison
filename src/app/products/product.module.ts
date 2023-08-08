@@ -9,7 +9,7 @@ import { ProductEditComponent } from './product-edit/product-edit.component';
 
 import { productReducer } from './state/product.reducer';
 import { ProductEffects } from './state/product.effects';
-import { EffectsModule, StoreModule } from 'mini-rx-store-ng';
+import { EffectsModule, StoreModule } from '@mini-rx/signal-store';
 
 const productRoutes: Routes = [{ path: '', component: ProductShellComponent }];
 

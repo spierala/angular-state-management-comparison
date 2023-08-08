@@ -1,6 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Store } from 'mini-rx-store';
-import { Observable } from 'rxjs';
+import { Injectable, Signal } from '@angular/core';
+import { Store } from '@mini-rx/signal-store';
 import { Product } from '../product';
 import { getCurrentProduct, getError, getProducts, getShowProductCode } from './index';
 import { ProductPageActions } from './actions';
@@ -9,10 +8,10 @@ import { ProductPageActions } from './actions';
     providedIn: 'root',
 })
 export class ProductStateFacadeService {
-    displayCode$: Observable<boolean> = this.store.select(getShowProductCode);
-    selectedProduct$: Observable<Product | undefined | null> = this.store.select(getCurrentProduct);
-    products$: Observable<Product[]> = this.store.select(getProducts);
-    errorMessage$: Observable<string> = this.store.select(getError);
+    displayCode$: Signal<boolean> = this.store.select(getShowProductCode);
+    selectedProduct$: Signal<Product | undefined | null> = this.store.select(getCurrentProduct);
+    products$: Signal<Product[]> = this.store.select(getProducts);
+    errorMessage$: Signal<string> = this.store.select(getError);
 
     constructor(private store: Store) {}
 
