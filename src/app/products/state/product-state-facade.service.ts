@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { catchError, concatMap, EMPTY, mergeMap, Observable, tap } from 'rxjs';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
-import { createEffectFn } from '@ngneat/effects';
 import { EffectFn } from '@ngneat/effects-ng';
 import { createState, select, Store, withProps } from '@ngneat/elf';
 
