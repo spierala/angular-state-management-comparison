@@ -23,6 +23,6 @@ export class UserStateFacadeService extends ComponentStore<UserState> {
     }
 
     maskUserName(): void {
-        this.update((state) => ({ maskUserName: !state.maskUserName }));
+        this.setState((state) => ({ maskUserName: !state.maskUserName }));
     }
 }
