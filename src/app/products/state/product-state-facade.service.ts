@@ -45,32 +45,32 @@ export class ProductStateFacadeService extends FeatureStore<ProductState> {
     }
 
     toggleProductCode(): void {
-        this.update((state) => ({ showProductCode: !state.showProductCode }));
+        this.setState((state) => ({ showProductCode: !state.showProductCode }));
     }
 
     initializeCurrentProduct(): void {
-        this.update({ currentProductId: 0 });
+        this.setState({ currentProductId: 0 });
     }
 
     setCurrentProduct(product: Product): void {
-        this.update({ currentProductId: product.id });
+        this.setState({ currentProductId: product.id });
     }
 
     clearCurrentProduct(): void {
-        this.update({ currentProductId: null });
+        this.setState({ currentProductId: null });
     }
 
     loadProducts = this.rxEffect<void>(
         mergeMap(() =>
             this.productService.getProducts().pipe(
                 tap((products) => {
-                    this.update({
+                    this.setState({
                         products,
                         error: '',
                     });
                 }),
                 catchError((error) => {
-                    this.update({
+                    this.setState({
                         products: [],
                         error,
                     });
@@ -84,7 +84,7 @@ export class ProductStateFacadeService extends FeatureStore<ProductState> {
         mergeMap((productToDelete: Product) =>
             this.productService.deleteProduct(productToDelete.id!).pipe(
                 tap((products) => {
-                    this.update((state) => ({
+                    this.setState((state) => ({
                         products: state.products.filter(
                             (product) => product.id !== productToDelete.id
                         ),
@@ -93,7 +93,7 @@ export class ProductStateFacadeService extends FeatureStore<ProductState> {
                     }));
                 }),
                 catchError((error) => {
-                    this.update({
+                    this.setState({
                         error,
                     });
                     return EMPTY;
@@ -106,14 +106,14 @@ export class ProductStateFacadeService extends FeatureStore<ProductState> {
         concatMap((productToCreate) =>
             this.productService.createProduct(productToCreate).pipe(
                 tap((createdProduct) => {
-                    this.update((state) => ({
+                    this.setState((state) => ({
                         products: [...state.products, createdProduct],
                         currentProductId: createdProduct.id,
                         error: '',
                     }));
                 }),
                 catchError((error) => {
-                    this.update({
+                    this.setState({
                         error,
                     });
                     return EMPTY;
@@ -126,7 +126,7 @@ export class ProductStateFacadeService extends FeatureStore<ProductState> {
         concatMap((productToUpdate) =>
             this.productService.updateProduct(productToUpdate).pipe(
                 tap((updatedProduct) => {
-                    this.update((state) => {
+                    this.setState((state) => {
                         const updatedProducts = state.products.map((item) =>
                             productToUpdate.id === item.id ? productToUpdate : item
                         );
@@ -139,7 +139,7 @@ export class ProductStateFacadeService extends FeatureStore<ProductState> {
                     });
                 }),
                 catchError((error) => {
-                    this.update({
+                    this.setState({
                         error,
                     });
                     return EMPTY;
