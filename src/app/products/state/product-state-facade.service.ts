@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { catchError, concatMap, EMPTY, mergeMap, Observable, Subject, tap } from 'rxjs';
+import { Injectable, Signal } from '@angular/core';
+import { catchError, concatMap, EMPTY, mergeMap, Subject, tap } from 'rxjs';
 import { StateService } from 'src/app/state.service';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
@@ -22,8 +22,8 @@ const initialState: ProductState = {
     providedIn: 'root',
 })
 export class ProductStateFacadeService extends StateService<ProductState> {
-    displayCode$: Observable<boolean> = this.select((state) => state.showProductCode);
-    selectedProduct$: Observable<Product | undefined | null> = this.select((state) => {
+    displayCode: Signal<boolean> = this.select((state) => state.showProductCode);
+    selectedProduct: Signal<Product | undefined | null> = this.select((state) => {
         if (state.currentProductId === 0) {
             return {
                 id: 0,
@@ -38,8 +38,8 @@ export class ProductStateFacadeService extends StateService<ProductState> {
                 : null;
         }
     });
-    products$: Observable<Product[]> = this.select((state) => state.products);
-    errorMessage$: Observable<string> = this.select((state) => state.error);
+    products: Signal<Product[]> = this.select((state) => state.products);
+    errorMessage: Signal<string> = this.select((state) => state.error);
 
     loadProductsSource: Subject<void> = new Subject();
     deleteProductSource: Subject<Product> = new Subject();

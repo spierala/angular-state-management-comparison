@@ -1,29 +1,26 @@
-// Copy pasted from here: https://dev.to/angular/simple-yet-powerful-state-management-in-angular-with-rxjs-4f8g
-
-import { BehaviorSubject, Observable } from 'rxjs';
-import { distinctUntilChanged, map } from 'rxjs/operators';
+// Signal variant of: https://dev.to/angular/simple-yet-powerful-state-management-in-angular-with-rxjs-4f8g
+import { computed, Signal, signal, WritableSignal } from '@angular/core';
 
 export class StateService<T> {
-    private state$: BehaviorSubject<T>;
+    private _state: WritableSignal<T>;
     protected get state(): T {
-        return this.state$.getValue();
+        return this._state();
     }
 
     constructor(initialState: T) {
-        this.state$ = new BehaviorSubject<T>(initialState);
+        this._state = signal<T>(initialState);
     }
 
-    protected select<K>(mapFn: (state: T) => K): Observable<K> {
-        return this.state$.asObservable().pipe(
-            map((state: T) => mapFn(state)),
-            distinctUntilChanged()
-        );
+    protected select<K>(mapFn: (state: T) => K): Signal<K> {
+        return computed(() => {
+            return mapFn(this._state());
+        });
     }
 
     protected setState(newState: Partial<T>) {
-        this.state$.next({
-            ...this.state,
+        this._state.update((state) => ({
+            ...state,
             ...newState,
-        });
+        }));
     }
 }

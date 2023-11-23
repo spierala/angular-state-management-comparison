@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
     }
 
     checkChanged(): void {
-        this.userStateFacade.maskUserName();
+        this.userStateFacade.toggleMaskUserName();
     }
 
     login(loginForm: NgForm): void {

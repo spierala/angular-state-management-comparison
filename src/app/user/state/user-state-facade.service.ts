@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Injectable, Signal } from '@angular/core';
 import { StateService } from 'src/app/state.service';
 import { User } from '../user';
 
@@ -17,13 +16,13 @@ const initialState: UserState = {
     providedIn: 'root',
 })
 export class UserStateFacadeService extends StateService<UserState> {
-    maskUserName$: Observable<boolean> = this.select((state) => state.maskUserName);
+    maskUserName: Signal<boolean> = this.select((state) => state.maskUserName);
 
     constructor() {
         super(initialState);
     }
 
-    maskUserName(): void {
+    toggleMaskUserName(): void {
         this.setState({ maskUserName: !this.state.maskUserName });
     }
 }
