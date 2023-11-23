@@ -49,10 +49,10 @@ Run `npm run build:stats` to let source-map-explorer calculate the bundle size.
 You are welcome to add your favourite state management library as well!
 
 1. Fork and clone the repo
-2. Create a branch based on master (or based on another branch with a familiar state management lib (e.g. "ng@16.1--akita@8.0")
-3. specify the Angular version and the state management lib version in the branch name: e.g. "ng@16.1--ngrx-store@16.1")
+2. Create a branch based on master (or based on another branch with a familiar state management lib (e.g. "ng@16.1.0--akita@8.0.0")
+3. Specify the Angular version and the state management lib version in the branch name: e.g. "ng@16.1.0--ngrx-store@16.1.0")
 4. Refactor to your favourite state management solution (to have equal conditions: try to follow the facade pattern for the state management code, pls use something for effects)
 5. Run `npm run build:stats` to check the bundle size
 6. Create a PR and add the bundle size in the PR description
 7. I will review your PR and add your results to the README on master
-8. The MR will be merged to a branch for reference in this repo. The branch will be linked in this README
+8. The PR will be merged to a branch for reference in this repo. The branch will be linked in this README
