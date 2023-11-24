@@ -48,11 +48,15 @@ Run `npm run build:stats` to let source-map-explorer calculate the bundle size.
 
 You are welcome to add your favourite state management library as well!
 
+You can follow these steps:
+
 1. Fork and clone the repo
-2. Create a branch based on master (or based on another branch with a familiar state management lib (e.g. "ng@16.1.0--akita@8.0.0")
-3. Specify the Angular version and the state management lib version in the branch name: e.g. "ng@16.1.0--ngrx-store@16.1.0")
-4. Refactor to your favourite state management solution (to have equal conditions: try to follow the facade pattern for the state management code, pls use something for effects)
+2. Create a branch based on master (or based on another branch with a familiar state management lib (e.g. "ng@17.0.3--diy-signal-state-service")
+3. Specify the Angular version and the state management library (and version) in the branch name: e.g. "ng@17.0.3--ngrx-signals@17.0.0")
+4. Now refactor to your favourite state management solution (to have equal conditions: try to follow the facade pattern for the state management code, and use something for effects)
 5. Run `npm run build:stats` to check the bundle size
-6. Create a PR and add the bundle size in the PR description
-7. I will review your PR and add your results to the README on master
-8. The PR will be merged to a branch for reference in this repo. The branch will be linked in this README
+6. Create the PR
+   - add the bundle size in the PR description
+   - target of the PR is this repo and the branch which you initially used as the base for your refactor-branch (e.g. "ng@17.0.3--diy-signal-state-service")
+7. I will review your PR and add your results to the README on the master branch
+8. Finally, I will merge your work to another branch which I will create (e.g. "ng@17.0.3--ngrx-signals@17.0.0") and link that branch in the README
