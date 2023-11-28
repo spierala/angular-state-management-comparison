@@ -1,14 +1,16 @@
 ## State Management Bundle Size Comparison Angular
 
-Checking the bundle sizes of different state management solutions with [source-map-explorer](https://www.npmjs.com/package/source-map-explorer).
+Checking the **app** bundle sizes for different state management solutions with [source-map-explorer](https://www.npmjs.com/package/source-map-explorer).
 
 The project is based on https://github.com/DeborahK/Angular-NgRx-GettingStarted.
 
 See the branches for the different setups.
 
-Run `npm run build:stats` to let source-map-explorer calculate the bundle size.
+Run `npm run build:stats` to let source-map-explorer calculate the **prod** bundle size.
 
 ## Results
+
+The measured size represents the **total size of the app**, which is build with **production** configuration.
 
 ### Angular 17.0.3
 
