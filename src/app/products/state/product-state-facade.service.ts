@@ -1,8 +1,10 @@
-import { Injectable, Signal } from '@angular/core';
-import { catchError, concatMap, EMPTY, mergeMap, tap } from 'rxjs';
+import { computed, inject } from '@angular/core';
+import { concatMap, mergeMap } from 'rxjs';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
-import { ComponentStore } from '@mini-rx/signal-store';
+import { tapResponse } from '@ngrx/operators';
+import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
 
 export interface ProductState {
     showProductCode: boolean;
@@ -18,133 +20,120 @@ const initialState: ProductState = {
     error: '',
 };
 
-@Injectable({
-    providedIn: 'root',
-})
-export class ProductStateFacadeService extends ComponentStore<ProductState> {
-    displayCode$: Signal<boolean> = this.select((state) => state.showProductCode);
-    selectedProduct$: Signal<Product | undefined | null> = this.select((state) => {
-        if (state.currentProductId === 0) {
-            return {
-                id: 0,
-                productName: '',
-                productCode: 'New',
-                description: '',
-                starRating: 0,
-            };
-        } else {
-            return state.currentProductId
-                ? state.products.find((p) => p.id === state.currentProductId)
-                : null;
-        }
-    });
-    products$: Signal<Product[]> = this.select((state) => state.products);
-    errorMessage$: Signal<string> = this.select((state) => state.error);
-    constructor(private productService: ProductService) {
-        super(initialState);
-    }
-
-    toggleProductCode(): void {
-        this.setState((state) => ({ showProductCode: !state.showProductCode }));
-    }
-
-    initializeCurrentProduct(): void {
-        this.setState({ currentProductId: 0 });
-    }
-
-    setCurrentProduct(product: Product): void {
-        this.setState({ currentProductId: product.id });
-    }
-
-    clearCurrentProduct(): void {
-        this.setState({ currentProductId: null });
-    }
-
-    loadProducts = this.rxEffect<void>(
-        mergeMap(() =>
-            this.productService.getProducts().pipe(
-                tap((products) => {
-                    this.setState({
-                        products,
-                        error: '',
-                    });
-                }),
-                catchError((error) => {
-                    this.setState({
-                        products: [],
-                        error,
-                    });
-                    return EMPTY;
-                })
+export const ProductsStore = signalStore(
+    withState(initialState),
+    withComputed((state) => ({
+        displayCode: computed(() => state.showProductCode()),
+        selectedProduct: computed(() => {
+            if (state.currentProductId() === 0) {
+                return {
+                    id: 0,
+                    productName: '',
+                    productCode: 'New',
+                    description: '',
+                    starRating: 0,
+                };
+            } else {
+                return state.currentProductId
+                    ? state.products().find((p) => p.id === state.currentProductId())
+                    : null;
+            }
+        }),
+    })),
+    withMethods((store, productService = inject(ProductService)) => ({
+        toggleProductCode(): void {
+            patchState(store, (state) => ({ showProductCode: !state.showProductCode }));
+        },
+        initializeCurrentProduct(): void {
+            patchState(store, { currentProductId: 0 });
+        },
+        setCurrentProduct(product: Product): void {
+            patchState(store, { currentProductId: product.id });
+        },
+        clearCurrentProduct(): void {
+            patchState(store, { currentProductId: null });
+        },
+        loadProducts: rxMethod<void>(
+            mergeMap(() =>
+                productService.getProducts().pipe(
+                    tapResponse({
+                        next: (products: Product[]) =>
+                            patchState(store, {
+                                products,
+                                error: '',
+                            }),
+                        error: () => {},
+                    })
+                )
             )
-        )
-    );
-
-    deleteProduct = this.rxEffect<Product>(
-        mergeMap((productToDelete: Product) =>
-            this.productService.deleteProduct(productToDelete.id!).pipe(
-                tap((products) => {
-                    this.setState((state) => ({
-                        products: state.products.filter(
-                            (product) => product.id !== productToDelete.id
-                        ),
-                        currentProductId: null,
-                        error: '',
-                    }));
-                }),
-                catchError((error) => {
-                    this.setState({
-                        error,
-                    });
-                    return EMPTY;
-                })
+        ),
+        deleteProduct: rxMethod<Product>(
+            mergeMap((productToDelete: Product) =>
+                productService.deleteProduct(productToDelete.id!).pipe(
+                    tapResponse({
+                        next: (products) => {
+                            patchState(store, (state) => ({
+                                products: state.products.filter(
+                                    (product) => product.id !== productToDelete.id
+                                ),
+                                currentProductId: null,
+                                error: '',
+                            }));
+                        },
+                        error: (error: string) => {
+                            patchState(store, {
+                                error,
+                            });
+                        },
+                    })
+                )
             )
-        )
-    );
-
-    createProduct = this.rxEffect<Product>(
-        concatMap((productToCreate) =>
-            this.productService.createProduct(productToCreate).pipe(
-                tap((createdProduct) => {
-                    this.setState((state) => ({
-                        products: [...state.products, createdProduct],
-                        currentProductId: createdProduct.id,
-                        error: '',
-                    }));
-                }),
-                catchError((error) => {
-                    this.setState({
-                        error,
-                    });
-                    return EMPTY;
-                })
+        ),
+        createProduct: rxMethod<Product>(
+            concatMap((productToCreate) =>
+                productService.createProduct(productToCreate).pipe(
+                    tapResponse({
+                        next: (createdProduct) => {
+                            patchState(store, (state) => ({
+                                products: [...state.products, createdProduct],
+                                currentProductId: createdProduct.id,
+                                error: '',
+                            }));
+                        },
+                        error: (error: string) => {
+                            patchState(store, {
+                                error,
+                            });
+                        },
+                    })
+                )
             )
-        )
-    );
+        ),
+        updateProduct: rxMethod<Product>(
+            concatMap((productToUpdate) =>
+                productService.updateProduct(productToUpdate).pipe(
+                    tapResponse({
+                        next: (updatedProduct) => {
+                            patchState(store, (state) => {
+                                const updatedProducts = state.products.map((item) =>
+                                    productToUpdate.id === item.id ? productToUpdate : item
+                                );
 
-    updateProduct = this.rxEffect<Product>(
-        concatMap((productToUpdate) =>
-            this.productService.updateProduct(productToUpdate).pipe(
-                tap((updatedProduct) => {
-                    this.setState((state) => {
-                        const updatedProducts = state.products.map((item) =>
-                            productToUpdate.id === item.id ? productToUpdate : item
-                        );
-
-                        return {
-                            products: updatedProducts,
-                            currentProductId: updatedProduct.id,
-                            error: '',
-                        };
-                    });
-                }),
-                catchError((error) => {
-                    this.setState({
-                        error,
-                    });
-                    return EMPTY;
-                })
+                                return {
+                                    products: updatedProducts,
+                                    currentProductId: updatedProduct.id,
+                                    error: '',
+                                };
+                            });
+                        },
+                        error: (error: string) => {
+                            patchState(store, {
+                                error,
+                            });
+                        },
+                    })
+                )
             )
-        )
-    );
-}
+        ),
+    }))
+);

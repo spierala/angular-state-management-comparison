@@ -1,16 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Product } from '../product';
-import {
-    ProductStateFacadeService,
-} from '../state/product-state-facade.service';
+import { ProductsStore } from '../state/product-state-facade.service';
 
 @Component({
     templateUrl: './product-shell.component.html',
+    providers: [ProductsStore],
 })
 export class ProductShellComponent implements OnInit {
-    constructor(
-        public productState: ProductStateFacadeService,
-    ) {}
+    productState = inject(ProductsStore);
 
     ngOnInit(): void {
         this.productState.loadProducts();
