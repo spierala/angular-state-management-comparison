@@ -1,10 +1,10 @@
 <div class="row">
     <div class="col-md-4">
         <pm-product-list
-            [displayCode]="productState.displayCode()"
-            [products]="productState.products()"
-            [selectedProduct]="productState.selectedProduct()"
-            [errorMessage]="productState.error()"
+            [displayCode]="productStore.displayCode()"
+            [products]="productStore.products()"
+            [selectedProduct]="productStore.selectedProduct()"
+            [errorMessage]="productStore.error()"
             (displayCodeChanged)="checkChanged()"
             (initializeNewProduct)="newProduct()"
             (productWasSelected)="productSelected($any($event))"
@@ -12,9 +12,9 @@
     </div>
     <div class="col-md-8">
         <pm-product-edit
-            *ngIf="productState.selectedProduct() as selectedProduct"
+            *ngIf="productStore.selectedProduct() as selectedProduct"
             [selectedProduct]="selectedProduct"
-            [errorMessage]="productState.error()"
+            [errorMessage]="productStore.error()"
             (clearCurrent)="clearProduct()"
             (update)="updateProduct($any($event))"
             (delete)="deleteProduct($any($event))"

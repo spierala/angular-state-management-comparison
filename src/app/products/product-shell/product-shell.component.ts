@@ -1,43 +1,43 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Product } from '../product';
-import { ProductsStore } from '../state/product-state-facade.service';
+import { ProductsStore } from '../state/product-store';
 
 @Component({
     templateUrl: './product-shell.component.html',
     providers: [ProductsStore],
 })
 export class ProductShellComponent implements OnInit {
-    productState = inject(ProductsStore);
+    productStore = inject(ProductsStore);
 
     ngOnInit(): void {
-        this.productState.loadProducts();
+        this.productStore.loadProducts();
     }
 
     checkChanged(): void {
-        this.productState.toggleProductCode();
+        this.productStore.toggleProductCode();
     }
 
     newProduct(): void {
-        this.productState.initializeCurrentProduct();
+        this.productStore.initializeCurrentProduct();
     }
 
     productSelected(product: Product): void {
-        this.productState.setCurrentProduct(product);
+        this.productStore.setCurrentProduct(product);
     }
 
     deleteProduct(product: Product): void {
-        this.productState.deleteProduct(product);
+        this.productStore.deleteProduct(product);
     }
 
     clearProduct(): void {
-        this.productState.clearCurrentProduct();
+        this.productStore.clearCurrentProduct();
     }
 
     saveProduct(product: Product): void {
-        this.productState.createProduct(product);
+        this.productStore.createProduct(product);
     }
 
     updateProduct(product: Product): void {
-        this.productState.updateProduct(product);
+        this.productStore.updateProduct(product);
     }
 }

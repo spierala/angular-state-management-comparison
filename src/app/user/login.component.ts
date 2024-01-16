@@ -1,21 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
-import { UserStateFacadeService } from './state/user-state-facade.service';
+import { UserStore } from './state/user-store';
 
 @Component({
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css'],
+    providers: [UserStore],
 })
 export class LoginComponent implements OnInit {
     pageTitle = 'Log In';
 
-    constructor(
-        private authService: AuthService,
-        public userStateFacade: UserStateFacadeService,
-        private router: Router
-    ) {}
+    authService = inject(AuthService);
+    userStore = inject(UserStore);
+    router = inject(Router);
 
     ngOnInit(): void {}
 
@@ -24,7 +23,7 @@ export class LoginComponent implements OnInit {
     }
 
     checkChanged(): void {
-        this.userStateFacade.maskUserName();
+        this.userStore.toggleMaskUserName();
     }
 
     login(loginForm: NgForm): void {
