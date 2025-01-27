@@ -12,8 +12,7 @@
     </div>
     <div class="col-md-8">
         <pm-product-edit
-            *ngIf="productState.selectedProduct$() as selectedProduct"
-            [selectedProduct]="selectedProduct"
+            [selectedProduct]="productState.selectedProduct$()"
             [errorMessage]="productState.errorMessage$()"
             (clearCurrent)="clearProduct()"
             (update)="updateProduct($any($event))"
