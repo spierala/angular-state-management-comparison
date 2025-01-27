@@ -6,6 +6,7 @@ import { AuthService } from '../user/auth.service';
 @Component({
     selector: 'pm-menu',
     templateUrl: './menu.component.html',
+    standalone: false,
 })
 export class MenuComponent implements OnInit {
     pageTitle = 'Acme Product Management';

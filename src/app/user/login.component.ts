@@ -7,7 +7,6 @@ import { UserStore } from './state/user-store';
 @Component({
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css'],
-    providers: [UserStore],
 })
 export class LoginComponent implements OnInit {
     pageTitle = 'Log In';

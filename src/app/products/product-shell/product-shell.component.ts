@@ -4,7 +4,6 @@ import { ProductsStore } from '../state/product-store';
 
 @Component({
     templateUrl: './product-shell.component.html',
-    providers: [ProductsStore],
 })
 export class ProductShellComponent implements OnInit {
     productStore = inject(ProductsStore);
