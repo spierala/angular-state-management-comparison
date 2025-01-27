@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HttpClientModule, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 // Imports for loading & configuring the in-memory web api
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
@@ -30,11 +30,11 @@ import { extModules } from './build-specifics';
     bootstrap: [AppComponent],
     imports: [
         BrowserModule,
+        HttpClientModule,
         HttpClientInMemoryWebApiModule.forRoot(ProductData),
         UserModule,
         AppRoutingModule,
         extModules,
     ],
-    providers: [provideHttpClient(withInterceptorsFromDi())],
 })
 export class AppModule {}
