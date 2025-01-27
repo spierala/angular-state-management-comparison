@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 // Imports for loading & configuring the in-memory web api
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
@@ -21,6 +21,14 @@ import { extModules } from './build-specifics';
 import { StoreModule } from '@mini-rx/signal-store';
 
 @NgModule({
+    declarations: [
+        AppComponent,
+        ShellComponent,
+        MenuComponent,
+        WelcomeComponent,
+        PageNotFoundComponent,
+    ],
+    bootstrap: [AppComponent],
     imports: [
         BrowserModule,
         HttpClientModule,
@@ -30,13 +38,5 @@ import { StoreModule } from '@mini-rx/signal-store';
         StoreModule.forRoot({}),
         extModules,
     ],
-    declarations: [
-        AppComponent,
-        ShellComponent,
-        MenuComponent,
-        WelcomeComponent,
-        PageNotFoundComponent,
-    ],
-    bootstrap: [AppComponent],
 })
 export class AppModule {}
