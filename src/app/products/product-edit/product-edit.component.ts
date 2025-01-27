@@ -16,6 +16,7 @@ import { NumberValidators } from '../../shared/number.validator';
 @Component({
     selector: 'pm-product-edit',
     templateUrl: './product-edit.component.html',
+    standalone: false,
 })
 export class ProductEditComponent implements OnInit, OnChanges {
     pageTitle = 'Product Edit';
