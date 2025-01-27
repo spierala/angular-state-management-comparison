@@ -21,7 +21,7 @@ import { NumberValidators } from '../../shared/number.validator';
 export class ProductEditComponent implements OnInit, OnChanges {
     pageTitle = 'Product Edit';
     @Input() errorMessage: string;
-    @Input() selectedProduct: Product;
+    @Input() selectedProduct: Product | null | undefined;
     @Output() create = new EventEmitter<Product>();
     @Output() update = new EventEmitter<Product>();
     @Output() delete = new EventEmitter<Product>();
@@ -88,7 +88,7 @@ export class ProductEditComponent implements OnInit, OnChanges {
         this.displayMessage = this.genericValidator.processMessages(this.productForm);
     }
 
-    displayProduct(product: Product | null): void {
+    displayProduct(product: Product | null | undefined): void {
         if (product && this.productForm) {
             // Reset the form back to pristine
             this.productForm.reset();
