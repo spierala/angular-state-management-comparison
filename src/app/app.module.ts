@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 // Imports for loading & configuring the in-memory web api
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
@@ -22,16 +22,6 @@ import { EffectsModule } from '@ngrx/effects';
 import { extModules } from './build-specifics';
 
 @NgModule({
-    imports: [
-        BrowserModule,
-        HttpClientModule,
-        HttpClientInMemoryWebApiModule.forRoot(ProductData),
-        UserModule,
-        AppRoutingModule,
-        StoreModule.forRoot({}),
-        EffectsModule.forRoot([]),
-        extModules,
-    ],
     declarations: [
         AppComponent,
         ShellComponent,
@@ -40,5 +30,15 @@ import { extModules } from './build-specifics';
         PageNotFoundComponent,
     ],
     bootstrap: [AppComponent],
+    imports: [
+        BrowserModule,
+        HttpClientInMemoryWebApiModule.forRoot(ProductData),
+        UserModule,
+        AppRoutingModule,
+        StoreModule.forRoot({}),
+        EffectsModule.forRoot([]),
+        extModules,
+    ],
+    providers: [provideHttpClient(withInterceptorsFromDi())],
 })
 export class AppModule {}
