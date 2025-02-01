@@ -12,6 +12,23 @@ Run `npm run build:stats` to let source-map-explorer calculate the **prod** bund
 
 The measured size represents the **total size of the app**, which is build with **production** configuration.
 
+### Angular 19.1.3
+
+| Library                                     | Version | Size (KB) | Comments                                                             | Branch |
+|---------------------------------------------|---------|-----------|----------------------------------------------------------------------|--------|
+| DIY RxJS State Service                      | -       |           |                                                                      |        |
+| 🚦DIY Signal State Service                  | -       |           |                                                                      |        |
+| Elf                                         | 2.5.1   |           | Uses [ngneat/effects](https://github.com/ngneat/effects) for effects |        |
+| 🚦NgRx Signal Store                         | 19.0.0  |           |                                                                      |        |
+| MiniRx Store (Component Store API)          | 6.0.0   |           |                                                                      |        |
+| MiniRx Store (Feature Store API)            | 6.0.0   |           |                                                                      |        |
+| 🚦MiniRx Signal Store (Component Store API) | 3.0.0   |           |                                                                      |        |
+| 🚦MiniRx Signal Store (Feature Store API)   | 3.0.0   |           |                                                                      |        |
+| 🚦MiniRx Signal Store (Redux Store API)     | 3.0.0   |           | Uses [ts-action](https://github.com/cartant/ts-action) for actions   |        |
+| NgRx Component Store                        | 19.0.0  |           |                                                                      |        |
+| MiniRx Store (Redux Store API)              | 6.0.0   |           | Uses [ts-action](https://github.com/cartant/ts-action) for actions   |        |
+| NgRx Store                                  | 19.0.0  |           | Uses [ngrx/effects](https://ngrx.io/guide/effects) for effects       |        |
+
 ### Angular 17.0.3
 
 | Library                                     | Version     | Size (KB) | Comments                                                             | Branch                                                                                                                                                                                              |
