@@ -4,6 +4,7 @@ import { ProductStateFacadeService } from '../state/product-state-facade.service
 
 @Component({
     templateUrl: './product-shell.component.html',
+    standalone: false,
 })
 export class ProductShellComponent implements OnInit {
     constructor(public productState: ProductStateFacadeService) {}
