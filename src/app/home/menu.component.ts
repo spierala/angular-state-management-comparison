@@ -1,12 +1,13 @@
+import { NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AuthService } from '../user/auth.service';
 
 @Component({
     selector: 'pm-menu',
     templateUrl: './menu.component.html',
-    standalone: false,
+    imports: [RouterLinkActive, RouterLink, NgIf],
 })
 export class MenuComponent implements OnInit {
     pageTitle = 'Acme Product Management';

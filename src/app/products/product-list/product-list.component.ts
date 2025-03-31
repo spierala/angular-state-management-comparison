@@ -1,4 +1,6 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { NgClass, NgFor, NgIf } from '@angular/common';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+
 import { Product } from '../product';
 
 @Component({
@@ -6,7 +8,7 @@ import { Product } from '../product';
     templateUrl: './product-list.component.html',
     styleUrls: ['./product-list.component.css'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: false,
+    imports: [NgClass, NgFor, NgIf],
 })
 export class ProductListComponent {
     pageTitle = 'Products';

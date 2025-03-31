@@ -1,13 +1,10 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-
-import { AuthGuard } from './user/auth-guard.service';
+import { Routes } from '@angular/router';
 
 import { ShellComponent } from './home/shell.component';
 import { WelcomeComponent } from './home/welcome.component';
 import { PageNotFoundComponent } from './home/page-not-found.component';
 
-const appRoutes: Routes = [
+export const appRoutes: Routes = [
     {
         path: '',
         component: ShellComponent,
@@ -16,17 +13,17 @@ const appRoutes: Routes = [
             {
                 path: 'products',
                 // canActivate: [AuthGuard],
-                loadChildren: () =>
-                    import('./products/product.module').then((m) => m.ProductModule),
+                loadComponent: () =>
+                    import('./products/product-shell/product-shell.component').then(
+                        (x) => x.ProductShellComponent
+                    ),
+            },
+            {
+                path: 'login',
+                loadComponent: () => import('./user/login.component').then((x) => x.LoginComponent),
             },
             { path: '', redirectTo: 'welcome', pathMatch: 'full' },
         ],
     },
     { path: '**', component: PageNotFoundComponent },
 ];
-
-@NgModule({
-    imports: [RouterModule.forRoot(appRoutes)],
-    exports: [RouterModule],
-})
-export class AppRoutingModule {}

@@ -1,10 +1,14 @@
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+
 import { Product } from '../product';
+import { ProductEditComponent } from '../product-edit/product-edit.component';
+import { ProductListComponent } from '../product-list/product-list.component';
 import { ProductStateFacadeService } from '../state/product-state-facade.service';
 
 @Component({
     templateUrl: './product-shell.component.html',
-    standalone: false,
+    imports: [AsyncPipe, ProductEditComponent, ProductListComponent],
 })
 export class ProductShellComponent implements OnInit {
     constructor(public productState: ProductStateFacadeService) {}

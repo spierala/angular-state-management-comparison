@@ -1,3 +1,4 @@
+import { NgClass, NgIf } from '@angular/common';
 import {
     Component,
     OnInit,
@@ -7,7 +8,13 @@ import {
     OnChanges,
     SimpleChanges,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+    FormBuilder,
+    FormGroup,
+    FormsModule,
+    ReactiveFormsModule,
+    Validators,
+} from '@angular/forms';
 
 import { Product } from '../product';
 import { GenericValidator } from '../../shared/generic-validator';
@@ -16,7 +23,7 @@ import { NumberValidators } from '../../shared/number.validator';
 @Component({
     selector: 'pm-product-edit',
     templateUrl: './product-edit.component.html',
-    standalone: false,
+    imports: [NgClass, NgIf, FormsModule, ReactiveFormsModule],
 })
 export class ProductEditComponent implements OnInit, OnChanges {
     pageTitle = 'Product Edit';
