@@ -1,13 +1,15 @@
+import { AsyncPipe, NgClass, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+
 import { AuthService } from './auth.service';
 import { UserStateFacadeService } from './state/user-state-facade.service';
 
 @Component({
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css'],
-    standalone: false,
+    imports: [AsyncPipe, FormsModule, NgClass, NgIf],
 })
 export class LoginComponent implements OnInit {
     pageTitle = 'Log In';
